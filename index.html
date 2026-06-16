@@ -40,7 +40,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── NOISE GRAIN ── */
 body::after {
   content: "";
   position: fixed;
@@ -51,189 +50,73 @@ body::after {
   opacity: 0.6;
 }
 
-/* ── AMBIENT GLOW ORBS ── */
-.orb {
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: -1;
-  filter: blur(80px);
-  animation: drift 20s ease-in-out infinite alternate;
-}
-.orb-1 {
-  width: 600px; height: 600px;
-  top: -180px; left: -120px;
-  background: radial-gradient(circle, rgba(192,32,30,.12), transparent 70%);
-  animation-delay: 0s;
-}
-.orb-2 {
-  width: 500px; height: 500px;
-  top: 30%; right: -150px;
-  background: radial-gradient(circle, rgba(255,255,255,.04), transparent 70%);
-  animation-delay: -7s;
-}
-.orb-3 {
-  width: 400px; height: 400px;
-  bottom: 10%; left: 30%;
-  background: radial-gradient(circle, rgba(192,32,30,.07), transparent 70%);
-  animation-delay: -13s;
-}
-@keyframes drift {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(30px, 20px) scale(1.08); }
-}
+.orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: -1; filter: blur(80px); animation: drift 20s ease-in-out infinite alternate; }
+.orb-1 { width: 600px; height: 600px; top: -180px; left: -120px; background: radial-gradient(circle, rgba(192,32,30,.12), transparent 70%); animation-delay: 0s; }
+.orb-2 { width: 500px; height: 500px; top: 30%; right: -150px; background: radial-gradient(circle, rgba(255,255,255,.04), transparent 70%); animation-delay: -7s; }
+.orb-3 { width: 400px; height: 400px; bottom: 10%; left: 30%; background: radial-gradient(circle, rgba(192,32,30,.07), transparent 70%); animation-delay: -13s; }
+@keyframes drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(30px, 20px) scale(1.08); } }
 
-/* ── TOPBAR ── */
-.topbar {
-  position: sticky; top: 0; z-index: 100;
-  height: var(--nav-h);
-  background: rgba(6,6,6,.82);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-}
-.topbar-inner {
-  max-width: var(--max); margin: 0 auto;
-  height: 100%; padding: 0 24px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-}
+.topbar { position: sticky; top: 0; z-index: 100; height: var(--nav-h); background: rgba(6,6,6,.82); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+.topbar-inner { max-width: var(--max); margin: 0 auto; height: 100%; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; }
-.brand img {
-  height: 48px; width: auto; max-width: 160px;
-  object-fit: contain; border-radius: 8px;
-}
-.brand-text strong {
-  display: block; font-size: .82rem;
-  letter-spacing: .14em; text-transform: uppercase; color: var(--text);
-}
+.brand img { height: 48px; width: auto; max-width: 160px; object-fit: contain; border-radius: 8px; }
+.brand-text strong { display: block; font-size: .82rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text); }
 .brand-text span { display: block; color: var(--muted); font-size: .74rem; margin-top: 3px; }
-
-.nav-badge {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(192,32,30,.1); border: 1px solid rgba(192,32,30,.25);
-  padding: 6px 14px; border-radius: 999px;
-}
+.nav-badge { display: flex; align-items: center; gap: 8px; background: rgba(192,32,30,.1); border: 1px solid rgba(192,32,30,.25); padding: 6px 14px; border-radius: 999px; }
 .nav-badge .dot { width: 6px; height: 6px; background: var(--accent-light); border-radius: 50%; animation: pulse 2s infinite ease-in-out; }
 .nav-badge span { font-size: .72rem; font-weight: 600; color: var(--accent-light); letter-spacing: .1em; text-transform: uppercase; }
 @keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 8px var(--accent-light); } 50% { opacity: .4; box-shadow: none; } }
 
-/* ── HERO & SEARCH ── */
-.hero {
-  position: relative;
-  display: flex; flex-direction: column; align-items: center;
-  padding: 60px 24px; text-align: center;
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-}
-.hero-vignette {
-  position: absolute; inset: 0; z-index: 0;
-  background: radial-gradient(circle at top, rgba(6,6,6,0) 0%, var(--bg) 80%);
-}
-
+.hero { position: relative; display: flex; flex-direction: column; align-items: center; padding: 60px 24px; text-align: center; border-bottom: 1px solid var(--border); overflow: hidden; }
+.hero-vignette { position: absolute; inset: 0; z-index: 0; background: radial-gradient(circle at top, rgba(6,6,6,0) 0%, var(--bg) 80%); }
 .hero-content { position: relative; z-index: 2; width: 100%; max-width: 680px; }
-.kicker {
-  display: inline-flex; align-items: center; gap: 10px;
-  padding: 8px 16px; border-radius: 999px;
-  border: 1px solid rgba(192,32,30,.28);
-  background: rgba(192,32,30,.06); color: #ffb3b3;
-  font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
-  margin-bottom: 20px; animation: fadeUp .7s ease both;
-}
-.hero h1 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(3rem, 8vw, 6rem);
-  line-height: .95; letter-spacing: .03em;
-  text-transform: uppercase; font-weight: 400;
-  color: var(--text); animation: fadeUp .8s ease both; animation-delay: .1s;
-}
-.hero h1 em {
-  font-style: normal;
-  background: linear-gradient(135deg, var(--accent-light), var(--accent));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.hero-sub {
-  margin: 16px auto 40px; color: var(--muted);
-  font-size: 1.05rem; line-height: 1.6; max-width: 52ch;
-  animation: fadeUp .8s ease both; animation-delay: .2s;
-}
+.kicker { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(192,32,30,.28); background: rgba(192,32,30,.06); color: #ffb3b3; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 20px; animation: fadeUp .7s ease both; }
+.hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 8vw, 6rem); line-height: .95; letter-spacing: .03em; text-transform: uppercase; font-weight: 400; color: var(--text); animation: fadeUp .8s ease both; animation-delay: .1s; }
+.hero h1 em { font-style: normal; background: linear-gradient(135deg, var(--accent-light), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-sub { margin: 16px auto 40px; color: var(--muted); font-size: 1.05rem; line-height: 1.6; max-width: 52ch; animation: fadeUp .8s ease both; animation-delay: .2s; }
 
-/* ── SEARCH CARD ── */
-.search-card {
-  background: var(--surface);
-  border: 1px solid var(--border-2);
-  border-radius: var(--r); padding: 32px;
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  box-shadow: var(--shadow-deep);
-  animation: fadeUp .9s ease both; animation-delay: .3s;
-  text-align: left;
-}
-.search-card-title {
-  font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem;
-  letter-spacing: .05em; color: var(--text); margin-bottom: 24px; text-align: center;
-}
+.search-card { background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r); padding: 32px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: var(--shadow-deep); animation: fadeUp .9s ease both; animation-delay: .3s; text-align: left; }
+.search-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: .05em; color: var(--text); margin-bottom: 24px; text-align: center; }
 .input-group { display: flex; gap: 12px; margin-bottom: 16px; }
 .input-wrap { flex: 1; }
-.input-wrap label {
-  display: block; font-size: .68rem; font-weight: 700; color: var(--muted);
-  letter-spacing: .14em; text-transform: uppercase; margin-bottom: 8px;
-}
-.input-wrap input {
-  width: 100%; background: rgba(0,0,0,.4);
-  border: 1px solid var(--border); border-radius: var(--r-sm);
-  padding: 14px 16px; font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--text);
-  outline: none; transition: all .25s ease;
-}
+.input-wrap label { display: block; font-size: .68rem; font-weight: 700; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 8px; }
+.input-wrap input { width: 100%; background: rgba(0,0,0,.4); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px 16px; font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--text); outline: none; transition: all .25s ease; }
 .input-wrap input::placeholder { color: rgba(255,255,255,.2); }
 .input-wrap input:focus { border-color: var(--accent); background: rgba(0,0,0,.6); box-shadow: 0 0 0 3px rgba(192,32,30,.15); }
-.search-divider {
-  display: flex; align-items: center; gap: 14px; margin: 20px 0;
-}
+.search-divider { display: flex; align-items: center; gap: 14px; margin: 20px 0; }
 .search-divider::before, .search-divider::after { content:''; flex:1; height:1px; background:var(--border); }
 .search-divider span { font-size: .65rem; font-weight: 700; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; }
 
-.cta-primary {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  width: 100%; height: 54px; margin-top: 24px; border-radius: var(--r-sm);
-  background: linear-gradient(160deg, var(--accent-light) 0%, var(--accent) 100%);
-  color: #1a0000; font-weight: 700; font-size: .9rem; letter-spacing: .06em; text-transform: uppercase;
-  border: none; cursor: pointer;
-  box-shadow: 0 12px 36px rgba(192,32,30,.28), 0 0 0 1px rgba(192,32,30,.4);
-  transition: transform .25s ease, box-shadow .25s ease;
-}
+.cta-primary { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 54px; margin-top: 24px; border-radius: var(--r-sm); background: linear-gradient(160deg, var(--accent-light) 0%, var(--accent) 100%); color: #1a0000; font-weight: 700; font-size: .9rem; letter-spacing: .06em; text-transform: uppercase; border: none; cursor: pointer; box-shadow: 0 12px 36px rgba(192,32,30,.28), 0 0 0 1px rgba(192,32,30,.4); transition: transform .25s ease, box-shadow .25s ease; }
 .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 48px rgba(192,32,30,.38), 0 0 0 1px rgba(192,32,30,.55); }
 .cta-primary svg { width: 18px; height: 18px; }
 
-/* ── TRACKER RESULTS ── */
 .results-section { min-height: 50vh; padding: 60px 24px; display: none; }
 .results-section.visible { display: block; }
 .results-inner { max-width: 760px; margin: 0 auto; }
 
 .empty-state { text-align: center; padding: 60px 24px; display: none; }
 .empty-state.visible { display: block; }
-.empty-icon {
-  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 20px;
-  display: grid; place-items: center; background: rgba(255,255,255,.03); border: 1px solid var(--border);
-}
+.empty-icon { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 20px; display: grid; place-items: center; background: rgba(255,255,255,.03); border: 1px solid var(--border); }
 .empty-icon svg { width: 28px; height: 28px; color: var(--muted); }
 .empty-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: .05em; color: var(--text); margin-bottom: 10px; }
 .empty-sub { color: var(--muted); font-size: .95rem; line-height: 1.6; max-width: 380px; margin: 0 auto; }
 
-.tracker-card {
-  background: var(--surface); border: 1px solid var(--border-2);
-  border-radius: var(--r); overflow: hidden;
-  box-shadow: var(--shadow-deep); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  display: none; animation: fadeUp .5s ease forwards;
-}
+/* Debug error banner */
+.error-banner { background: rgba(192,32,30,.08); border: 1px solid rgba(192,32,30,.25); border-radius: var(--r-sm); padding: 16px 20px; margin-bottom: 20px; display: none; }
+.error-banner.visible { display: block; }
+.error-banner p { color: var(--accent-light); font-size: .85rem; line-height: 1.6; }
+.error-banner code { font-family: monospace; font-size: .8rem; background: rgba(0,0,0,.3); padding: 2px 6px; border-radius: 4px; }
+
+.tracker-card { background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-deep); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: none; animation: fadeUp .5s ease forwards; }
 .card-header { padding: 32px 36px; background: rgba(0,0,0,.4); border-bottom: 1px solid var(--border); }
 .card-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; gap: 12px; }
 .customer-name { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; letter-spacing: .03em; line-height: 1; margin-bottom: 8px; color: var(--text); }
 .id-badge { display: inline-block; background: rgba(255,255,255,.06); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: .8rem; font-weight: 600; letter-spacing: .05em; color: var(--muted); }
-
 .status-pill { padding: 8px 16px; border-radius: 999px; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
 .status-pill.active { background: rgba(192,32,30,.15); border: 1px solid rgba(192,32,30,.3); color: var(--accent-light); }
 .status-pill.ready { background: rgba(110,233,110,.1); border: 1px solid rgba(110,233,110,.3); color: #6ee96e; }
 .status-pill.hold { background: rgba(255,165,0,.1); border: 1px solid rgba(255,165,0,.3); color: #ffa500; }
-
 .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; }
 .meta-item { display: flex; flex-direction: column; gap: 4px; }
 .meta-label { font-size: .65rem; font-weight: 700; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
@@ -247,7 +130,6 @@ body::after {
 .stage-dot { position: absolute; left: -28px; width: 20px; height: 20px; border-radius: 50%; background: #111; border: 2px solid var(--border-2); display: grid; place-items: center; z-index: 1; transition: all .3s; }
 .stage-dot svg { width: 10px; height: 10px; opacity: 0; color: #fff; }
 .stage-label { font-size: .95rem; color: var(--muted); transition: all .3s; }
-
 .stage-item.completed .stage-dot { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.3); }
 .stage-item.completed .stage-dot svg { opacity: 1; }
 .stage-item.completed .stage-label { color: #d0cdc8; }
@@ -271,9 +153,9 @@ body::after {
 .last-updated svg { width: 14px; height: 14px; }
 .refresh-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 999px; font-family: 'DM Sans', sans-serif; font-size: .75rem; font-weight: 700; color: var(--text); cursor: pointer; transition: all .2s; letter-spacing: .05em; text-transform: uppercase; }
 .refresh-btn:hover { background: rgba(255,255,255,.1); }
-.refresh-btn svg { width: 14px; height: 14px; }
+.refresh-btn svg { width: 14px; height: 14px; transition: transform .5s ease; }
+.refresh-btn.spinning svg { animation: spin .8s linear infinite; }
 
-/* ── FOOTER ── */
 footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); background: linear-gradient(180deg, #070707, var(--bg)); }
 .footer-inner { max-width: var(--max); margin: 0 auto; }
 .footer-top { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-bottom: 40px; }
@@ -287,7 +169,6 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 .partner-chip img { height: 38px; width: auto; object-fit: contain; }
 .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.06); color: #4e4b47; font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; }
 
-/* ── LOADING OVERLAY ── */
 .loading-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(6,6,6,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); align-items: center; justify-content: center; flex-direction: column; gap: 24px; }
 .loading-overlay.visible { display: flex; }
 .spinner { width: 48px; height: 48px; border-radius: 50%; border: 3px solid rgba(192,32,30,.2); border-top-color: var(--accent-light); animation: spin .8s linear infinite; }
@@ -295,7 +176,6 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ── MOBILE ── */
 @media (max-width: 768px) {
   .input-group { flex-direction: column; gap: 16px; }
   .card-header, .progress-section, .eta-strip, .notes-strip, .card-footer-bar { padding: 24px; }
@@ -318,13 +198,13 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
-  <p class="loading-text">Encrypting Request...</p>
+  <p class="loading-text">Fetching Status...</p>
 </div>
 
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="#">
-      <img id="navLogo" src="https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/ersc_training_tactics_pty_ltd_cover.jpg" alt="TNT ERSC" />
+      <img src="https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/ersc_training_tactics_pty_ltd_cover.jpg" alt="TNT ERSC" />
       <div class="brand-text">
         <strong>TNT ERSC</strong>
         <span>Training & Tactics</span>
@@ -340,10 +220,10 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 <section class="hero">
   <div class="hero-vignette" aria-hidden="true"></div>
   <div class="hero-content">
-    <div class="kicker"><span class="kicker-dot"></span>Secure Verification</div>
+    <div class="kicker"><span></span>Secure Verification</div>
     <h1>Track Your<br><em>Application.</em></h1>
     <p class="hero-sub">Review your status, active compliance checks, and regulatory steps directly from our live database.</p>
-    
+
     <div class="search-card">
       <p class="search-card-title">Lookup Profile</p>
       <div class="input-group">
@@ -365,13 +245,17 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 
 <section class="results-section" id="resultsSection">
   <div class="results-inner">
-    
+
+    <div class="error-banner" id="errorBanner">
+      <p id="errorMsg"></p>
+    </div>
+
     <div class="empty-state" id="emptyState">
       <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.35-4.35"></path></svg></div>
       <h3 class="empty-title">Profile Not Found</h3>
-      <p class="empty-sub">No record matches your search parameters. Please confirm the details or reach out to our administration desk.</p>
+      <p class="empty-sub">No record matches your search. Please confirm your details or contact our administration desk.</p>
     </div>
-    
+
     <div class="tracker-card" id="vehicleCard">
       <div class="card-header">
         <div class="card-header-top">
@@ -388,25 +272,25 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
           <div class="meta-item"><span class="meta-label">Overall Status</span><span class="meta-value" id="cOverallStatus">—</span></div>
         </div>
       </div>
-      
+
       <div class="progress-section">
         <p class="progress-title">Compliance Workflow Roadmap</p>
         <div class="stage-track" id="stageTrack"></div>
       </div>
-      
+
       <div class="eta-strip" id="etaStrip" style="display:none">
         <div class="eta-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
         <div>
-          <div class="eta-label">Expected Finalization</div>
+          <div class="eta-label">Due Date</div>
           <div class="eta-message" id="cEta">—</div>
         </div>
       </div>
-      
+
       <div class="notes-strip" id="notesStrip" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         <p class="notes-text" id="cNote"></p>
       </div>
-      
+
       <div class="card-footer-bar">
         <div class="last-updated">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
@@ -421,7 +305,7 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
   </div>
 </section>
 
-<footer id="footer">
+<footer>
   <div class="footer-inner">
     <div class="footer-top">
       <div class="footer-brand">
@@ -450,10 +334,9 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 </footer>
 
 <script>
-// --- Logic & Data Handling ---
+// ── CONFIG ───────────────────────────────────────────────────────────────────
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwI5xO2njaxS3JP8Rh1Utc5gDoIbAiaqe6splx5nqQg0dbKPVEkLbJ9h9IZWFAZQ/pub?output=csv';
 
-// MAPS EXACTLY TO YOUR SHEET STAGES
 const STAGES = [
   'Application Received',
   'Payment Confirmed',
@@ -464,184 +347,384 @@ const STAGES = [
   'Closed'
 ];
 
-let cachedData = null, cachedAt = 0, isFetching = false;
+// ── NORMALISERS ──────────────────────────────────────────────────────────────
+// Strip BOM, trim, lowercase, collapse spaces — used for header matching
+const normKey = h => String(h || '').replace(/^\uFEFF/, '').trim().toLowerCase().replace(/\s+/g, ' ');
+// Strip everything non-alphanumeric — used for value comparisons
+const normVal = v => String(v || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
 
-const clean = v => String(v || '').replace(/^\uFEFF/, '').trim();
-const normKey = v => clean(v).toLowerCase().replace(/\s+/g,' ').replace(/[^a-z0-9 ]/g,'');
-const normVal = v => clean(v).toLowerCase().replace(/\s+/g,'');
-const g = (r, k) => { const v = r[normKey(k)]; return v && String(v).trim() !== '' ? String(v).trim() : '—'; };
+// ── COLUMN RESOLVER ──────────────────────────────────────────────────────────
+// After parsing, we resolve column keys once and reuse them.
+// This function finds the best-matching header for each logical field.
+function resolveColumns(headers) {
+  // Each entry: [logicalKey, [...candidateSubstrings in priority order]]
+  const FIELDS = [
+    ['clientId',      ['client id', 'clientid', 'id number', 'idnumber', 'client_id']],
+    ['firstName',     ['name', 'first name', 'firstname']],
+    ['surname',       ['surname', 'last name', 'lastname']],
+    ['appType',       ['application type', 'app type', 'apptype', 'type']],
+    ['currentStage',  ['current stage', 'stage']],
+    ['status',        ['status']],
+    ['assignee',      ['assignee', 'assigned to', 'handler']],
+    ['dueDate',       ['due date', 'duedate', 'due']],
+    ['priority',      ['priority']],
+    ['completed',     ['completed', 'complete', 'done']],
+    ['description',   ['description', 'notes', 'note', 'status note', 'comments']],
+    ['updatedAt',     ['updated at', 'updatedat', 'last updated', 'lastupdated', 'modified']],
+  ];
 
-function canonicalStage(raw) {
-  const s = normVal(raw);
-  if (!s) return STAGES[0];
-  const matched = STAGES.find(st => normVal(st) === s || s.includes(normVal(st)));
-  return matched || STAGES[0];
+  const map = {};
+  const used = new Set();
+
+  FIELDS.forEach(([logicalKey, candidates]) => {
+    for (const candidate of candidates) {
+      const idx = headers.findIndex((h, i) => !used.has(i) && h === candidate);
+      if (idx !== -1) { map[logicalKey] = idx; used.add(idx); break; }
+    }
+    // Partial match fallback
+    if (map[logicalKey] === undefined) {
+      for (const candidate of candidates) {
+        const idx = headers.findIndex((h, i) => !used.has(i) && (h.includes(candidate) || candidate.includes(h)));
+        if (idx !== -1) { map[logicalKey] = idx; used.add(idx); break; }
+      }
+    }
+  });
+
+  return map;
 }
 
-function setLoading(show){ document.getElementById('loadingOverlay').classList.toggle('visible', show); }
+// Get a cell value by logical key using the resolved column map
+function getField(row, colMap, key) {
+  const idx = colMap[key];
+  if (idx === undefined || idx === null) return '—';
+  const v = row[idx];
+  return (v !== undefined && String(v).trim() !== '') ? String(v).trim() : '—';
+}
 
-function parseCSV(text){
-  const rows=[]; let row=[], cell='', q=false;
-  for(let i=0;i<text.length;i++){
-    const c=text[i], n=text[i+1];
-    if(c==='"'){ if(q&&n==='"'){cell+='"'; i++;} else q=!q; }
-    else if(c===','&&!q){ row.push(cell); cell=''; }
-    else if((c==='\n'||c==='\r')&&!q){
-      if(c==='\r'&&n==='\n') i++; row.push(cell);
-      if(row.some(v=>String(v).trim())) rows.push(row);
-      row=[]; cell='';
-    } else cell+=c;
+// ── DATE HELPER ──────────────────────────────────────────────────────────────
+function excelDateToString(serial) {
+  if (!serial || serial === '—') return serial;
+  // Already a readable date string (contains letters or slashes)
+  if (/[a-zA-Z\/\-]/.test(serial)) return serial;
+  const num = parseFloat(serial);
+  if (isNaN(num) || num < 1) return serial;
+  const date = new Date((num - 25569) * 86400 * 1000);
+  if (isNaN(date.getTime())) return serial;
+  return date.toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+// ── CSV PARSER ───────────────────────────────────────────────────────────────
+function parseCSV(text) {
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], n = text[i + 1];
+    if (c === '"') { if (q && n === '"') { cell += '"'; i++; } else q = !q; }
+    else if (c === ',' && !q) { row.push(cell); cell = ''; }
+    else if ((c === '\n' || c === '\r') && !q) {
+      if (c === '\r' && n === '\n') i++;
+      row.push(cell);
+      if (row.some(v => String(v).trim())) rows.push(row);
+      row = []; cell = '';
+    } else cell += c;
   }
-  row.push(cell); if(row.some(v=>String(v).trim())) rows.push(row);
+  row.push(cell);
+  if (row.some(v => String(v).trim())) rows.push(row);
   return rows;
 }
 
-function findHeaderRow(rows){
-  const required=['id number','id','first name','name','surname','last name','application type','application types','stage','stages','status','statuses'].map(normKey);
-  for(let i=0;i<rows.length;i++){
-    const n=rows[i].map(normKey);
-    const score=required.filter(h=>n.some(header => header.includes(h) || h.includes(header))).length;
-    if(score>=2) return i;
+// Find the actual header row (skip any blank/title rows at top)
+function findHeaderRow(rows) {
+  const signals = ['name', 'surname', 'current stage', 'application type', 'status', 'client id', 'stage', 'assignee'];
+  for (let i = 0; i < Math.min(rows.length, 10); i++) {
+    const normalized = rows[i].map(normKey);
+    const hits = signals.filter(s => normalized.some(h => h === s || h.includes(s) || s.includes(h))).length;
+    if (hits >= 2) return i;
   }
   return 0;
 }
 
-function mapRow(headers,row){ const o={}; headers.forEach((h,i)=>o[h]=(row[i] ?? '').toString().trim()); return o; }
+// ── STATE ────────────────────────────────────────────────────────────────────
+let cachedData   = null;
+let cachedColMap = null;
+let cachedAt     = 0;
+let isFetching   = false;
+let lastSearchFirst = '', lastSearchLast = '', lastSearchId = '';
 
-async function fetchSnapshot(){
-  const url = CSV_URL + (CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
-  const res = await fetch(url, { cache:'no-store' });
-  if(!res.ok) throw new Error('HTTP ' + res.status);
-  const rows = parseCSV(await res.text());
-  const headerIndex = findHeaderRow(rows);
-  const headers = rows[headerIndex].map(normKey);
-  return rows.slice(headerIndex + 1).map(r => mapRow(headers, r)).filter(r => Object.values(r).some(v => String(v).trim() !== ''));
+// ── FETCH ─────────────────────────────────────────────────────────────────────
+async function fetchSnapshot() {
+  const url = CSV_URL + (CSV_URL.includes('?') ? '&' : '?') + 'nocache=' + Date.now();
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const text = await res.text();
+  const rawRows = parseCSV(text);
+  if (!rawRows.length) throw new Error('Empty CSV response');
+
+  const headerIndex = findHeaderRow(rawRows);
+  const rawHeaders  = rawRows[headerIndex];
+  const headers     = rawHeaders.map(normKey);
+  const colMap      = resolveColumns(headers);
+
+  // Log detected columns to console for debugging
+  console.log('[ERSC] Detected headers:', headers);
+  console.log('[ERSC] Column map:', colMap);
+
+  const dataRows = rawRows.slice(headerIndex + 1)
+    .map(r => {
+      // Pad short rows so index access is safe
+      while (r.length < rawHeaders.length) r.push('');
+      return r;
+    })
+    .filter(r => r.some(v => String(v).trim() !== ''));
+
+  return { rows: dataRows, colMap };
 }
 
-async function fetchData(forceFresh=false){
-  if(!forceFresh && cachedData && (Date.now() - cachedAt < 15000)) return cachedData;
-  if(isFetching) return cachedData || [];
+async function fetchData(forceFresh = false) {
+  if (!forceFresh && cachedData && (Date.now() - cachedAt < 15000)) {
+    return { rows: cachedData, colMap: cachedColMap };
+  }
+  if (isFetching) return { rows: cachedData || [], colMap: cachedColMap || {} };
   isFetching = true;
   try {
-    const data = await fetchSnapshot();
-    if(data) { cachedData = data; cachedAt = Date.now(); }
-    return cachedData || [];
-  } catch(err) {
-    console.error(err);
-    return cachedData || [];
-  } finally { isFetching = false; }
+    const result = await fetchSnapshot();
+    if (result.rows && result.rows.length > 0) {
+      cachedData   = result.rows;
+      cachedColMap = result.colMap;
+      cachedAt     = Date.now();
+    }
+    return { rows: cachedData || [], colMap: cachedColMap || {} };
+  } catch (err) {
+    console.error('[ERSC] Fetch error:', err);
+    showError('Could not reach the data source. Check your sheet is published as CSV. Error: ' + err.message);
+    return { rows: cachedData || [], colMap: cachedColMap || {} };
+  } finally {
+    isFetching = false;
+  }
 }
 
-function buildStageTrack(currentStage){
-  const track=document.getElementById('stageTrack'); track.innerHTML='';
-  const canonical = canonicalStage(currentStage);
-  const currentIdx = STAGES.findIndex(s => normVal(s) === normVal(canonical));
-  const idx = currentIdx === -1 ? 0 : currentIdx;
-  
-  STAGES.forEach((s,i)=>{
-    const item=document.createElement('div'); item.className='stage-item';
-    if(i<idx) item.classList.add('completed');
-    if(i===idx) item.classList.add('current');
-    
-    const dot=document.createElement('div'); dot.className='stage-dot';
-    if(i<idx) dot.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-    else if(i===idx) dot.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"></circle></svg>`;
-    
-    const label=document.createElement('span'); label.className='stage-label'; label.textContent=s;
-    if(i===idx){
-      const badge=document.createElement('span'); badge.className='current-badge'; badge.textContent='Active';
-      label.appendChild(badge);
-    }
-    item.appendChild(dot); item.appendChild(label); track.appendChild(item);
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+function normaliseId(raw) {
+  // Handle scientific notation Google Sheets sometimes exports for large numbers
+  let s = String(raw || '').trim();
+  if (/e/i.test(s)) {
+    try { s = String(Math.round(parseFloat(s))); } catch (_) {}
+  }
+  return s.replace(/[^0-9a-z]/gi, '').toLowerCase();
+}
+
+function findMatch(rows, colMap, fVal, lVal, idVal) {
+  if (!rows || !rows.length) return null;
+  return rows.find(r => {
+    const rowId    = normaliseId(getField(r, colMap, 'clientId'));
+    const rowFirst = normVal(getField(r, colMap, 'firstName'));
+    const rowLast  = normVal(getField(r, colMap, 'surname'));
+
+    if (idVal && rowId && rowId === idVal) return true;
+    if (fVal && lVal && rowFirst === fVal && rowLast === lVal) return true;
+    return false;
   });
 }
 
-function showResult(record){
-  const resultsSection=document.getElementById('resultsSection');
-  const emptyState=document.getElementById('emptyState');
-  const vehicleCard=document.getElementById('vehicleCard');
+// ── UI HELPERS ────────────────────────────────────────────────────────────────
+function setLoading(show) {
+  document.getElementById('loadingOverlay').classList.toggle('visible', show);
+}
+
+function showError(msg) {
+  const banner = document.getElementById('errorBanner');
+  const msgEl  = document.getElementById('errorMsg');
+  if (msg) {
+    msgEl.textContent = msg;
+    banner.classList.add('visible');
+  } else {
+    banner.classList.remove('visible');
+  }
+}
+
+// ── STAGE RENDERER ────────────────────────────────────────────────────────────
+function buildStageTrack(rawStage) {
+  const track = document.getElementById('stageTrack');
+  track.innerHTML = '';
+
+  const normalized = normVal(rawStage);
+  let currentIdx = STAGES.findIndex(s => normVal(s) === normalized);
+  // Partial fallback
+  if (currentIdx === -1) currentIdx = STAGES.findIndex(s => normalized.includes(normVal(s)) || normVal(s).includes(normalized));
+  if (currentIdx === -1) {
+    console.warn('[ERSC] Could not match stage:', rawStage, '→ normalized:', normalized);
+    currentIdx = 0;
+  }
+
+  STAGES.forEach((s, i) => {
+    const item = document.createElement('div');
+    item.className = 'stage-item';
+    if (i < currentIdx) item.classList.add('completed');
+    if (i === currentIdx) item.classList.add('current');
+
+    const dot = document.createElement('div');
+    dot.className = 'stage-dot';
+    if (i < currentIdx) {
+      dot.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    } else if (i === currentIdx) {
+      dot.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"></circle></svg>`;
+    }
+
+    const label = document.createElement('span');
+    label.className = 'stage-label';
+    label.textContent = s;
+
+    if (i === currentIdx) {
+      const badge = document.createElement('span');
+      badge.className = 'current-badge';
+      badge.textContent = 'Active';
+      label.appendChild(badge);
+    }
+
+    item.appendChild(dot);
+    item.appendChild(label);
+    track.appendChild(item);
+  });
+}
+
+// ── DISPLAY ───────────────────────────────────────────────────────────────────
+function showResult(record, colMap) {
+  const resultsSection = document.getElementById('resultsSection');
+  const emptyState     = document.getElementById('emptyState');
+  const vehicleCard    = document.getElementById('vehicleCard');
+
   resultsSection.classList.add('visible');
-  
-  if(!record){ emptyState.classList.add('visible'); vehicleCard.style.display='none'; resultsSection.scrollIntoView({ behavior:'smooth' }); return; }
-  emptyState.classList.remove('visible'); vehicleCard.style.display='block';
-  
-  // PULL SPECIFIC COLUMNS FROM YOUR TRACKER
-  const first = g(record,'First Name') !== '—' ? g(record,'First Name') : g(record,'Name');
-  const last = g(record,'Surname') !== '—' ? g(record,'Surname') : g(record,'Last Name');
-  const idNum = g(record,'ID Number') !== '—' ? g(record,'ID Number') : g(record,'ID');
-  
-  const stage = g(record,'Stage') !== '—' ? g(record,'Stage') : (g(record,'Stages') !== '—' ? g(record,'Stages') : 'Application Received');
-  const appType = g(record,'Application Type') !== '—' ? g(record,'Application Type') : (g(record,'Application Types') !== '—' ? g(record,'Application Types') : '—');
-  const status = g(record,'Status') !== '—' ? g(record,'Status') : (g(record,'Statuses') !== '—' ? g(record,'Statuses') : 'Processing');
-  const priority = g(record,'Priority') !== '—' ? g(record,'Priority') : '—';
-  const assignee = g(record,'Assignee') !== '—' ? g(record,'Assignee') : (g(record,'Assignees') !== '—' ? g(record,'Assignees') : '—');
-  const completed = g(record,'Completed') !== '—' ? g(record,'Completed') : 'No';
-  
-  document.getElementById('cName').textContent = [first, last].filter(v=>v!=='—').join(' ') || 'Application Profile';
-  document.getElementById('cIDNumber').textContent = 'ID/Passport: ' + idNum;
-  document.getElementById('cType').textContent = appType;
-  document.getElementById('cPriority').textContent = priority;
-  document.getElementById('cAssignee').textContent = assignee;
+
+  if (!record) {
+    emptyState.classList.add('visible');
+    vehicleCard.style.display = 'none';
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+
+  emptyState.classList.remove('visible');
+  vehicleCard.style.display = 'block';
+
+  const firstName   = getField(record, colMap, 'firstName');
+  const surname     = getField(record, colMap, 'surname');
+  const clientId    = getField(record, colMap, 'clientId');
+  const stage       = getField(record, colMap, 'currentStage');
+  const appType     = getField(record, colMap, 'appType');
+  const status      = getField(record, colMap, 'status');
+  const priority    = getField(record, colMap, 'priority');
+  const assignee    = getField(record, colMap, 'assignee');
+  const completed   = getField(record, colMap, 'completed');
+  const dueDate     = getField(record, colMap, 'dueDate');
+  const description = getField(record, colMap, 'description');
+  const updatedAt   = getField(record, colMap, 'updatedAt');
+
+  console.log('[ERSC] Rendering record —', { firstName, surname, clientId, stage, status });
+
+  const fullName = [firstName, surname].filter(v => v !== '—').join(' ') || 'Application Profile';
+  document.getElementById('cName').textContent    = fullName;
+  document.getElementById('cIDNumber').textContent = clientId !== '—' ? 'Client ID: ' + clientId : 'No ID on file';
+  document.getElementById('cType').textContent          = appType;
+  document.getElementById('cPriority').textContent      = priority;
+  document.getElementById('cAssignee').textContent      = assignee;
   document.getElementById('cOverallStatus').textContent = status;
-  
-  // Custom pill logic handling "On Hold", "Done", or "Completed"
-  const pill = document.getElementById('cStatusPill');
-  if(normVal(completed) === 'yes' || normVal(status) === 'done' || normVal(stage) === 'closed') {
-    pill.textContent = 'Completed / Done'; pill.className = 'status-pill ready';
-  } else if(normVal(status) === 'onhold') {
+
+  // Status pill
+  const pill    = document.getElementById('cStatusPill');
+  const stageN  = normVal(stage);
+  const statusN = normVal(status);
+  const compN   = normVal(completed);
+
+  if (compN === 'yes' || statusN === 'done' || stageN === 'closed') {
+    pill.textContent = 'Completed'; pill.className = 'status-pill ready';
+  } else if (statusN === 'onhold') {
     pill.textContent = 'On Hold'; pill.className = 'status-pill hold';
   } else {
     pill.textContent = 'Processing'; pill.className = 'status-pill active';
   }
-  
+
   buildStageTrack(stage);
-  
-  const eta = g(record,'Expected Finalization') !== '—' ? g(record,'Expected Finalization') : g(record,'ETA');
+
+  // Due date
   const etaStrip = document.getElementById('etaStrip');
-  if(eta && eta !== '—') { etaStrip.style.display='flex'; document.getElementById('cEta').textContent=eta; }
-  else { etaStrip.style.display='none'; }
-  
-  const note = g(record,'Status Note') !== '—' ? g(record,'Status Note') : g(record,'Notes');
-  const notesStrip = document.getElementById('notesStrip');
-  if(note && note !== '—') { notesStrip.style.display='flex'; document.getElementById('cNote').textContent=note; }
-  else { notesStrip.style.display='none'; }
-  
-  document.getElementById('cLastUpdated').textContent = 'Synchronized: ' + (g(record,'Last Updated') !== '—' ? g(record,'Last Updated') : 'Just Now');
-  resultsSection.scrollIntoView({ behavior:'smooth' });
-}
-
-async function doSearch(){
-  const fVal = normVal(document.getElementById('firstName').value);
-  const lVal = normVal(document.getElementById('lastName').value);
-  const idVal = normVal(document.getElementById('idNumber').value);
-  
-  if(!idVal && (!fVal || !lVal)){ alert('Please provide an ID/Passport Number or both First Name & Surname.'); return; }
-  
-  setLoading(true);
-  const data = await fetchData(true);
-  setLoading(false);
-  
-  let match = null;
-  if(data && data.length > 0) {
-    match = data.find(r => {
-      const rowID = normVal(g(r,'ID Number') !== '—' ? g(r,'ID Number') : g(r,'ID'));
-      const rowFirst = normVal(g(r,'First Name') !== '—' ? g(r,'First Name') : g(r,'Name'));
-      const rowLast = normVal(g(r,'Surname') !== '—' ? g(r,'Surname') : g(r,'Last Name'));
-      
-      if(idVal && rowID && rowID === idVal) return true;
-      if(fVal && lVal && rowFirst === fVal && rowLast === lVal) return true;
-      return false;
-    });
+  if (dueDate && dueDate !== '—') {
+    etaStrip.style.display = 'flex';
+    document.getElementById('cEta').textContent = excelDateToString(dueDate);
+  } else {
+    etaStrip.style.display = 'none';
   }
-  showResult(match);
+
+  // Description / notes
+  const notesStrip = document.getElementById('notesStrip');
+  if (description && description !== '—') {
+    notesStrip.style.display = 'flex';
+    document.getElementById('cNote').textContent = description;
+  } else {
+    notesStrip.style.display = 'none';
+  }
+
+  // Last updated
+  const updatedStr = updatedAt !== '—' ? excelDateToString(updatedAt) : 'Just Now';
+  document.getElementById('cLastUpdated').textContent = 'Last updated: ' + updatedStr;
+
+  resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
 
-async function refreshData(){
-  const btn = document.getElementById('refreshBtn');
-  btn.style.opacity = '0.5'; btn.disabled = true;
-  await doSearch();
-  btn.style.opacity = '1'; btn.disabled = false;
+// ── SEARCH TRIGGER ────────────────────────────────────────────────────────────
+async function doSearch() {
+  const fVal  = normVal(document.getElementById('firstName').value);
+  const lVal  = normVal(document.getElementById('lastName').value);
+  const idVal = normaliseId(document.getElementById('idNumber').value);
+
+  if (!idVal && (!fVal || !lVal)) {
+    alert('Please provide an ID / Passport Number, or both First Name and Surname.');
+    return;
+  }
+
+  lastSearchFirst = fVal;
+  lastSearchLast  = lVal;
+  lastSearchId    = idVal;
+
+  showError(null);
+  setLoading(true);
+  const { rows, colMap } = await fetchData(true);
+  setLoading(false);
+
+  if (!rows.length) {
+    showError('No data was loaded from the sheet. Make sure the Google Sheet is published to the web as CSV and the URL is correct.');
+    document.getElementById('resultsSection').classList.add('visible');
+    document.getElementById('emptyState').classList.add('visible');
+    document.getElementById('vehicleCard').style.display = 'none';
+    return;
+  }
+
+  const match = findMatch(rows, colMap, fVal, lVal, idVal);
+  showResult(match || null, colMap);
 }
+
+// ── REFRESH ───────────────────────────────────────────────────────────────────
+async function refreshData() {
+  if (!lastSearchFirst && !lastSearchLast && !lastSearchId) {
+    cachedData = null; cachedColMap = null;
+    return;
+  }
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  showError(null);
+
+  const { rows, colMap } = await fetchData(true);
+  const match = findMatch(rows, colMap, lastSearchFirst, lastSearchLast, lastSearchId);
+  showResult(match || null, colMap);
+
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+}
+
+// Enter key support
+['firstName','lastName','idNumber'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+});
 </script>
 </body>
 </html>
