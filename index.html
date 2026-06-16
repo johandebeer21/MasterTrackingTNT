@@ -2,236 +2,454 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TNT ERSC — Application Status Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#060606" />
+<title>TNT ERSC | Application Status Tracker</title>
+<link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/ERSC%20Logo.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
 <style>
-  :root{
-    --ink:#0b0f17; --ink2:#161c26; --slate:#2c3545; --muted:#627289; --whisper:#b8c4d4;
-    --fog:#e9ecf0; --snow:#f5f7fa; --white:#fff; --gold:#c5a045; --gold2:#e5c26b; --goldp:#fbf4e2;
-    --crimson:#9e2a2b; --crimsonp:#fbebeb; --radius-md:12px; --radius-lg:20px; --radius-xl:32px;
-    --shadow-lg:0 24px 64px rgba(11,15,23,.16); --transition:all .25s ease;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{font-family:'DM Sans',sans-serif;background:var(--snow);color:var(--ink);overflow-x:hidden}
-  .hero{position:relative;min-height:100vh;display:flex;flex-direction:column}
-  .hero-bg,.hero-overlay,.hero-grain{position:absolute;inset:0}
-  .hero-bg{z-index:0;background-color:var(--ink)}
-  .hero-overlay{z-index:1;background:linear-gradient(160deg,rgba(11,15,23,.95),rgba(22,28,38,.85),rgba(11,15,23,.92))}
-  .hero-grain{z-index:2;opacity:.025;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");background-size:128px}
-  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid rgba(255,255,255,.06)}
-  .nav-logo{display:flex;align-items:center;gap:14px;min-width:0}
-  .nav-logo-img{height:54px;width:auto;max-width:260px;object-fit:contain;display:block;opacity:1}
-  .nav-logo-fallback{display:none;flex-direction:column}
-  .brand-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--white);letter-spacing:.05em;line-height:1}
-  .brand-sub{font-size:10px;font-weight:600;color:var(--gold2);letter-spacing:.25em;text-transform:uppercase;margin-top:4px}
-  .nav-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);padding:8px 16px;border-radius:999px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);flex-shrink:0}
-  .nav-badge .dot{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:pulse 2s infinite ease-in-out}
-  .nav-badge span{font-size:11px;font-weight:600;color:rgba(255,255,255,.9);letter-spacing:.05em;text-transform:uppercase}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
-  .hero-content{position:relative;z-index:10;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px 80px;text-align:center}
-  .hero-eyebrow{display:inline-flex;align-items:center;background:rgba(201,160,69,.12);border:1px solid rgba(201,160,69,.25);padding:6px 18px;border-radius:999px;margin-bottom:24px;animation:fadeUp .7s .2s ease forwards;opacity:0}
-  .hero-eyebrow span{font-size:11px;font-weight:600;color:var(--gold2);letter-spacing:.16em;text-transform:uppercase}
-  .hero-headline{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,6.5vw,72px);font-weight:400;color:var(--white);line-height:1.1;letter-spacing:-.01em;margin-bottom:16px;animation:fadeUp .7s .35s ease forwards;opacity:0}
-  .hero-headline em{font-style:italic;color:var(--gold2)}
-  .hero-sub{font-size:16px;font-weight:400;color:rgba(255,255,255,.6);max-width:520px;line-height:1.6;margin-bottom:44px;animation:fadeUp .7s .5s ease forwards;opacity:0}
-  .search-card{width:100%;max-width:580px;background:rgba(255,255,255,.05);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-xl);padding:36px;box-shadow:0 32px 80px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);animation:fadeUp .7s .65s ease forwards;opacity:0}
-  .search-card-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--white);margin-bottom:24px;letter-spacing:.02em}
-  .search-divider{display:flex;align-items:center;gap:14px;margin:20px 0}
-  .search-divider::before,.search-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
-  .search-divider span{font-size:11px;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:.12em;text-transform:uppercase}
-  .input-group{display:flex;gap:12px;margin-bottom:16px}
-  .input-wrap{flex:1;text-align:left}
-  .input-wrap label{display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
-  .input-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-md);padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--white);outline:none;transition:var(--transition)}
-  .input-wrap input::placeholder{color:rgba(255,255,255,.25)}
-  .input-wrap input:focus{border-color:var(--gold);background:rgba(255,255,255,.1);box-shadow:0 0 0 3px rgba(197,160,69,.15)}
-  .input-solo{margin-bottom:0}
-  .input-solo .input-wrap input{letter-spacing:.08em}
-  .search-btn{width:100%;margin-top:24px;padding:16px;background:linear-gradient(135deg,var(--gold) 0%,#a68332 100%);border:none;border-radius:var(--radius-md);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:var(--ink);letter-spacing:.06em;cursor:pointer;transition:var(--transition);box-shadow:0 8px 24px rgba(197,160,69,.25);display:flex;align-items:center;justify-content:center;gap:10px}
-  .search-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(197,160,69,.38)}
-  .search-btn svg{width:18px;height:18px}
-  .scroll-hint{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;padding-bottom:32px;animation:fadeIn 1s 1.4s ease forwards;opacity:0}
-  .scroll-hint span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px}
-  .scroll-arrow{width:1px;height:32px;background:linear-gradient(to bottom,rgba(255,255,255,.3),transparent);animation:scrollFade 1.8s infinite ease-in-out}
-  @keyframes scrollFade{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.15)}}
-  .results-section{min-height:100vh;padding:80px 24px;background:var(--snow);display:none}
-  .results-section.visible{display:block}
-  .results-inner{max-width:760px;margin:0 auto}
-  .empty-state{text-align:center;padding:80px 24px;display:none}
-  .empty-state.visible{display:block}
-  .empty-icon{width:64px;height:64px;background:var(--fog);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px}
-  .empty-icon svg{width:28px;height:28px;color:var(--muted)}
-  .empty-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:var(--ink);margin-bottom:10px}
-  .empty-sub{font-size:15px;color:var(--muted);max-width:380px;margin:0 auto;line-height:1.6}
-  
-  /* Modified Profile Card Header to fit the customized brand cover */
-  .vehicle-card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:24px;display:none;animation:cardIn .5s ease forwards}
-  @keyframes cardIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-  .card-header{position:relative;padding:44px 36px;background-color:var(--ink);background-image:url("https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/ersc_training_tactics_pty_ltd_cover.jpg");background-size:cover;background-position:center}
-  .card-header-overlay{position:absolute;inset:0;background:linear-gradient(to right, rgba(11,15,23,0.95) 40%, rgba(11,15,23,0.7) 100%);z-index:1}
-  .card-header-content{position:relative;z-index:2}
-  .card-header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:12px}
-  .customer-name{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:var(--white);line-height:1.1;margin-bottom:6px}
-  .vehicle-plate{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:5px 14px;border-radius:6px;font-size:13px;font-weight:600;color:var(--gold2);letter-spacing:.05em}
-  .status-pill{padding:8px 16px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-  .status-pill.active{background:rgba(201,160,69,.25);border:1px solid rgba(201,160,69,.4);color:var(--gold2);backdrop-filter:blur(4px)}
-  .status-pill.ready{background:rgba(74,222,128,.2);border:1px solid rgba(74,222,128,.4);color:#4ade80;backdrop-filter:blur(4px)}
-  .vehicle-meta{display:flex;gap:24px;flex-wrap:wrap}
-  .meta-item{display:flex;flex-direction:column;gap:3px}
-  .meta-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase}
-  .meta-value{font-size:14px;font-weight:500;color:rgba(255,255,255,.9)}
-  
-  .progress-section{padding:36px 36px 28px;border-bottom:1px solid var(--fog)}
-  .progress-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px}
-  .stage-track{position:relative;padding-left:28px}
-  .stage-track::before{content:'';position:absolute;left:9px;top:10px;bottom:10px;width:2px;background:var(--fog);border-radius:2px}
-  .stage-item{position:relative;display:flex;align-items:center;gap:16px;margin-bottom:4px;padding:10px 0}
-  .stage-dot{position:absolute;left:-28px;width:20px;height:20px;border-radius:50%;background:var(--fog);border:2px solid var(--whisper);display:flex;align-items:center;justify-content:center;transition:var(--transition);z-index:1}
-  .stage-dot svg{width:10px;height:10px;opacity:0;transition:var(--transition)}
-  .stage-label{font-size:14px;color:var(--muted);font-weight:400;transition:var(--transition)}
-  .stage-item.completed .stage-dot{background:var(--slate);border-color:var(--slate)}
-  .stage-item.completed .stage-dot svg{opacity:1;color:white}
-  .stage-item.completed .stage-label{color:var(--ink);font-weight:500}
-  .stage-item.current .stage-dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px rgba(197,160,69,.2)}
-  .stage-item.current .stage-dot svg{opacity:1;color:var(--ink)}
-  .stage-item.current .stage-label{font-weight:700;color:var(--ink);font-size:15px}
-  .stage-current-badge{display:inline-flex;align-items:center;background:var(--goldp);border:1px solid rgba(197,160,69,.3);padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;color:#7c6224;letter-spacing:.06em;margin-left:6px;text-transform:uppercase}
-  .eta-strip{padding:24px 36px;border-bottom:1px solid var(--fog);display:flex;align-items:center;gap:20px}
-  .eta-icon{width:48px;height:48px;background:var(--goldp);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center}
-  .eta-icon svg{width:22px;height:22px;color:var(--gold)}
-  .eta-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
-  .eta-message{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--ink);line-height:1.3}
-  .notes-strip{padding:20px 36px;background:var(--snow);border-bottom:1px solid var(--fog);display:flex;align-items:flex-start;gap:14px}
-  .notes-strip svg{width:18px;height:18px;color:var(--muted);flex-shrink:0;margin-top:2px}
-  .notes-text{font-size:14px;color:var(--slate);line-height:1.6}
-  .info-grid{padding:28px 36px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .info-tile{background:var(--white);border-radius:var(--radius-md);padding:18px 16px;border:1px solid var(--fog)}
-  .info-tile-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
-  .info-tile-value{font-size:15px;font-weight:700;color:var(--ink);line-height:1.3}
-  .card-footer-bar{padding:18px 36px;background:var(--fog);display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .last-updated{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
-  .last-updated svg{width:14px;height:14px}
-  .refresh-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;background:var(--white);border:1px solid var(--whisper);border-radius:999px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:var(--slate);cursor:pointer;transition:var(--transition)}
-  .refresh-btn:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
-  .refresh-btn svg{width:13px;height:13px}
-  .page-footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.06);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-  .footer-brand{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--white);letter-spacing:.05em}
-  .footer-copy{font-size:11px;color:rgba(255,255,255,.3)}
-  .loading-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(11,15,23,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:20px}
-  .loading-overlay.visible{display:flex}
-  .loading-spinner{width:50px;height:50px;border-radius:50%;border:3px solid rgba(201,160,69,.15);border-top-color:var(--gold);animation:spin .8s linear infinite}
-  .loading-text{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white);letter-spacing:.05em}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-  @media (max-width:700px){
-    nav{padding:16px 20px}
-    .nav-logo-img{height:42px}
-    .search-card{padding:24px 20px}
-    .input-group{flex-direction:column;gap:16px}
-    .card-header{padding:28px 20px}
-    .card-header-top{flex-direction:column;gap:12px}
-    .progress-section,.eta-strip,.notes-strip,.info-grid,.card-footer-bar{padding:20px}
-    .info-grid{grid-template-columns:1fr 1fr}
-    .info-grid .info-tile:last-child{grid-column:span 2}
-  }
+:root {
+  --bg: #060606;
+  --surface: rgba(255,255,255,.04);
+  --surface-hover: rgba(255,255,255,.08);
+  --border: rgba(255,255,255,.09);
+  --border-2: rgba(255,255,255,.18);
+  --text: #f2f0f0;
+  --muted: #8a8484;
+  --accent: #c0201e;
+  --accent-light: #e8403e;
+  --shadow-deep: 0 32px 80px rgba(0,0,0,.60);
+  --r: 20px;
+  --r-sm: 12px;
+  --max: 1160px;
+  --nav-h: 72px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NOISE GRAIN ── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.6;
+}
+
+/* ── AMBIENT GLOW ORBS ── */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(80px);
+  animation: drift 20s ease-in-out infinite alternate;
+}
+.orb-1 {
+  width: 600px; height: 600px;
+  top: -180px; left: -120px;
+  background: radial-gradient(circle, rgba(192,32,30,.12), transparent 70%);
+  animation-delay: 0s;
+}
+.orb-2 {
+  width: 500px; height: 500px;
+  top: 30%; right: -150px;
+  background: radial-gradient(circle, rgba(255,255,255,.04), transparent 70%);
+  animation-delay: -7s;
+}
+.orb-3 {
+  width: 400px; height: 400px;
+  bottom: 10%; left: 30%;
+  background: radial-gradient(circle, rgba(192,32,30,.07), transparent 70%);
+  animation-delay: -13s;
+}
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, 20px) scale(1.08); }
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  height: var(--nav-h);
+  background: rgba(6,6,6,.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-inner {
+  max-width: var(--max); margin: 0 auto;
+  height: 100%; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.brand { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.brand img {
+  height: 48px; width: auto; max-width: 160px;
+  object-fit: contain; border-radius: 8px;
+}
+.brand-text strong {
+  display: block; font-size: .82rem;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--text);
+}
+.brand-text span { display: block; color: var(--muted); font-size: .74rem; margin-top: 3px; }
+
+.nav-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(192,32,30,.1); border: 1px solid rgba(192,32,30,.25);
+  padding: 6px 14px; border-radius: 999px;
+}
+.nav-badge .dot { width: 6px; height: 6px; background: var(--accent-light); border-radius: 50%; animation: pulse 2s infinite ease-in-out; }
+.nav-badge span { font-size: .72rem; font-weight: 600; color: var(--accent-light); letter-spacing: .1em; text-transform: uppercase; }
+@keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 8px var(--accent-light); } 50% { opacity: .4; box-shadow: none; } }
+
+/* ── HERO & SEARCH ── */
+.hero {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 60px 24px; text-align: center;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.hero-vignette {
+  position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(circle at top, rgba(6,6,6,0) 0%, var(--bg) 80%);
+}
+
+.hero-content { position: relative; z-index: 2; width: 100%; max-width: 680px; }
+.kicker {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 16px; border-radius: 999px;
+  border: 1px solid rgba(192,32,30,.28);
+  background: rgba(192,32,30,.06); color: #ffb3b3;
+  font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+  margin-bottom: 20px; animation: fadeUp .7s ease both;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  line-height: .95; letter-spacing: .03em;
+  text-transform: uppercase; font-weight: 400;
+  color: var(--text); animation: fadeUp .8s ease both; animation-delay: .1s;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub {
+  margin: 16px auto 40px; color: var(--muted);
+  font-size: 1.05rem; line-height: 1.6; max-width: 52ch;
+  animation: fadeUp .8s ease both; animation-delay: .2s;
+}
+
+/* ── SEARCH CARD ── */
+.search-card {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r); padding: 32px;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-deep);
+  animation: fadeUp .9s ease both; animation-delay: .3s;
+  text-align: left;
+}
+.search-card-title {
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem;
+  letter-spacing: .05em; color: var(--text); margin-bottom: 24px; text-align: center;
+}
+.input-group { display: flex; gap: 12px; margin-bottom: 16px; }
+.input-wrap { flex: 1; }
+.input-wrap label {
+  display: block; font-size: .68rem; font-weight: 700; color: var(--muted);
+  letter-spacing: .14em; text-transform: uppercase; margin-bottom: 8px;
+}
+.input-wrap input {
+  width: 100%; background: rgba(0,0,0,.4);
+  border: 1px solid var(--border); border-radius: var(--r-sm);
+  padding: 14px 16px; font-family: 'DM Sans', sans-serif; font-size: 1rem; color: var(--text);
+  outline: none; transition: all .25s ease;
+}
+.input-wrap input::placeholder { color: rgba(255,255,255,.2); }
+.input-wrap input:focus { border-color: var(--accent); background: rgba(0,0,0,.6); box-shadow: 0 0 0 3px rgba(192,32,30,.15); }
+.search-divider {
+  display: flex; align-items: center; gap: 14px; margin: 20px 0;
+}
+.search-divider::before, .search-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.search-divider span { font-size: .65rem; font-weight: 700; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; }
+
+.cta-primary {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; height: 54px; margin-top: 24px; border-radius: var(--r-sm);
+  background: linear-gradient(160deg, var(--accent-light) 0%, var(--accent) 100%);
+  color: #1a0000; font-weight: 700; font-size: .9rem; letter-spacing: .06em; text-transform: uppercase;
+  border: none; cursor: pointer;
+  box-shadow: 0 12px 36px rgba(192,32,30,.28), 0 0 0 1px rgba(192,32,30,.4);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.cta-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 48px rgba(192,32,30,.38), 0 0 0 1px rgba(192,32,30,.55); }
+.cta-primary svg { width: 18px; height: 18px; }
+
+/* ── TRACKER RESULTS ── */
+.results-section { min-height: 50vh; padding: 60px 24px; display: none; }
+.results-section.visible { display: block; }
+.results-inner { max-width: 760px; margin: 0 auto; }
+
+.empty-state { text-align: center; padding: 60px 24px; display: none; }
+.empty-state.visible { display: block; }
+.empty-icon {
+  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 20px;
+  display: grid; place-items: center; background: rgba(255,255,255,.03); border: 1px solid var(--border);
+}
+.empty-icon svg { width: 28px; height: 28px; color: var(--muted); }
+.empty-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: .05em; color: var(--text); margin-bottom: 10px; }
+.empty-sub { color: var(--muted); font-size: .95rem; line-height: 1.6; max-width: 380px; margin: 0 auto; }
+
+.tracker-card {
+  background: var(--surface); border: 1px solid var(--border-2);
+  border-radius: var(--r); overflow: hidden;
+  box-shadow: var(--shadow-deep); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  display: none; animation: fadeUp .5s ease forwards;
+}
+.card-header { padding: 32px 36px; background: rgba(0,0,0,.4); border-bottom: 1px solid var(--border); }
+.card-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; gap: 12px; }
+.customer-name { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; letter-spacing: .03em; line-height: 1; margin-bottom: 8px; color: var(--text); }
+.id-badge { display: inline-block; background: rgba(255,255,255,.06); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: .8rem; font-weight: 600; letter-spacing: .05em; color: var(--muted); }
+
+.status-pill { padding: 8px 16px; border-radius: 999px; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.status-pill.active { background: rgba(192,32,30,.15); border: 1px solid rgba(192,32,30,.3); color: var(--accent-light); }
+.status-pill.ready { background: rgba(110,233,110,.1); border: 1px solid rgba(110,233,110,.3); color: #6ee96e; }
+
+.meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; }
+.meta-item { display: flex; flex-direction: column; gap: 4px; }
+.meta-label { font-size: .65rem; font-weight: 700; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
+.meta-value { font-size: .95rem; font-weight: 500; color: var(--text); }
+
+.progress-section { padding: 36px; border-bottom: 1px solid var(--border); }
+.progress-title { font-size: .75rem; font-weight: 700; color: var(--accent-light); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 28px; }
+.stage-track { position: relative; padding-left: 28px; }
+.stage-track::before { content:''; position: absolute; left: 9px; top: 10px; bottom: 10px; width: 2px; background: rgba(255,255,255,.06); border-radius: 2px; }
+.stage-item { position: relative; display: flex; align-items: center; gap: 16px; margin-bottom: 8px; padding: 6px 0; }
+.stage-dot { position: absolute; left: -28px; width: 20px; height: 20px; border-radius: 50%; background: #111; border: 2px solid var(--border-2); display: grid; place-items: center; z-index: 1; transition: all .3s; }
+.stage-dot svg { width: 10px; height: 10px; opacity: 0; color: #fff; }
+.stage-label { font-size: .95rem; color: var(--muted); transition: all .3s; }
+
+.stage-item.completed .stage-dot { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.3); }
+.stage-item.completed .stage-dot svg { opacity: 1; }
+.stage-item.completed .stage-label { color: #d0cdc8; }
+.stage-item.current .stage-dot { background: var(--accent); border-color: var(--accent-light); box-shadow: 0 0 12px rgba(192,32,30,.4); }
+.stage-item.current .stage-dot svg { opacity: 1; color: #1a0000; }
+.stage-item.current .stage-label { font-weight: 700; color: var(--text); }
+.current-badge { display: inline-block; margin-left: 8px; font-size: .65rem; font-weight: 700; color: var(--accent-light); border: 1px solid rgba(192,32,30,.3); background: rgba(192,32,30,.1); padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .08em; }
+
+.eta-strip { padding: 24px 36px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 20px; background: rgba(255,255,255,.01); }
+.eta-icon { width: 48px; height: 48px; background: rgba(192,32,30,.1); border: 1px solid rgba(192,32,30,.2); border-radius: 12px; display: grid; place-items: center; }
+.eta-icon svg { width: 22px; height: 22px; color: var(--accent-light); }
+.eta-label { font-size: .65rem; font-weight: 700; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 4px; }
+.eta-message { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: .03em; color: var(--text); line-height: 1; }
+
+.notes-strip { padding: 20px 36px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 14px; background: rgba(0,0,0,.2); }
+.notes-strip svg { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; margin-top: 2px; }
+.notes-text { font-size: .9rem; color: #d0cdc8; line-height: 1.6; }
+
+.card-footer-bar { padding: 20px 36px; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.last-updated { display: flex; align-items: center; gap: 8px; font-size: .75rem; color: var(--muted); }
+.last-updated svg { width: 14px; height: 14px; }
+.refresh-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 999px; font-family: 'DM Sans', sans-serif; font-size: .75rem; font-weight: 700; color: var(--text); cursor: pointer; transition: all .2s; letter-spacing: .05em; text-transform: uppercase; }
+.refresh-btn:hover { background: rgba(255,255,255,.1); }
+.refresh-btn svg { width: 14px; height: 14px; }
+
+/* ── FOOTER ── */
+footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); background: linear-gradient(180deg, #070707, var(--bg)); }
+.footer-inner { max-width: var(--max); margin: 0 auto; }
+.footer-top { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-bottom: 40px; }
+.footer-brand { display: flex; align-items: flex-start; gap: 16px; }
+.footer-brand img { height: 56px; width: auto; object-fit: contain; border-radius: 8px; }
+.footer-brand h5 { font-size: .9rem; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 6px; }
+.footer-brand p { color: var(--muted); font-size: .87rem; line-height: 1.65; max-width: 38ch; }
+.partner-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; }
+.partner-chip { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid var(--border); }
+.partner-chip span { font-size: .72rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+.partner-chip img { height: 38px; width: auto; object-fit: contain; }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.06); color: #4e4b47; font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; }
+
+/* ── LOADING OVERLAY ── */
+.loading-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(6,6,6,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); align-items: center; justify-content: center; flex-direction: column; gap: 24px; }
+.loading-overlay.visible { display: flex; }
+.spinner { width: 48px; height: 48px; border-radius: 50%; border: 3px solid rgba(192,32,30,.2); border-top-color: var(--accent-light); animation: spin .8s linear infinite; }
+.loading-text { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: .05em; color: var(--text); }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  .input-group { flex-direction: column; gap: 16px; }
+  .card-header, .progress-section, .eta-strip, .notes-strip, .card-footer-bar { padding: 24px; }
+  .card-header-top { flex-direction: column; }
+  .footer-top { grid-template-columns: 1fr; }
+  .partner-row { justify-content: flex-start; }
+}
+@media (max-width: 480px) {
+  :root { --nav-h: 60px; }
+  .brand-text { display: none; }
+  .nav-badge span { display: none; }
+}
 </style>
 </head>
 <body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
 <div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
-  <p class="loading-text">Locating your application profile...</p>
+  <div class="spinner"></div>
+  <p class="loading-text">Encrypting Request...</p>
 </div>
-<section class="hero">
-  <div class="hero-bg">
-    <div class="hero-overlay"></div>
-    <div class="hero-grain"></div>
-  </div>
-  <nav>
-    <div class="nav-logo">
-      <img id="navLogo" class="nav-logo-img" src="https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/ersc_training_tactics_pty_ltd_cover.jpg" alt="TNT ERSC" onload="this.style.opacity='1'" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';" />
-      <div class="nav-logo-fallback" id="logoFallback">
-        <span class="brand-name">TNT ERSC</span>
-        <span class="brand-sub">Training & Tactics</span>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#">
+      <img id="navLogo" src="https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/ersc_training_tactics_pty_ltd_cover.jpg" alt="TNT ERSC" />
+      <div class="brand-text">
+        <strong>TNT ERSC</strong>
+        <span>Training & Tactics</span>
       </div>
+    </a>
+    <div class="nav-badge">
+      <div class="dot"></div>
+      <span>Live Status Portal</span>
     </div>
-    <div class="nav-badge"><div class="dot"></div><span>Live Status System</span></div>
-  </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-vignette" aria-hidden="true"></div>
   <div class="hero-content">
-    <div class="hero-eyebrow"><span>✦ Secure Verification Portal</span></div>
-    <h1 class="hero-headline">Track Your Application<br /><em>In Real Time</em></h1>
-    <p class="hero-sub">Review your status, active compliance checks, and regulatory steps dynamically directly from our live database.</p>
+    <div class="kicker"><span class="kicker-dot"></span>Secure Verification</div>
+    <h1>Track Your<br><em>Application.</em></h1>
+    <p class="hero-sub">Review your status, active compliance checks, and regulatory steps directly from our live database.</p>
+    
     <div class="search-card">
-      <p class="search-card-title">Application Lookup</p>
+      <p class="search-card-title">Lookup Profile</p>
       <div class="input-group">
         <div class="input-wrap"><label for="firstName">First Name</label><input id="firstName" type="text" placeholder="e.g. Johan" /></div>
         <div class="input-wrap"><label for="lastName">Surname</label><input id="lastName" type="text" placeholder="e.g. De Beer" /></div>
       </div>
       <div class="search-divider"><span>or verify via identifier</span></div>
-      <div class="input-group input-solo">
-        <div class="input-wrap"><label for="idNumber">ID / Passport Number</label><input id="idNumber" type="text" placeholder="e.g. 9512285187084" /></div>
+      <div class="input-wrap">
+        <label for="idNumber">ID / Passport Number</label>
+        <input id="idNumber" type="text" placeholder="e.g. 9512285187084" />
       </div>
-      <button class="search-btn" id="searchBtn" onclick="doSearch()">
+      <button class="cta-primary" id="searchBtn" onclick="doSearch()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.35-4.35"></path></svg>
         Verify Status
       </button>
     </div>
   </div>
-  <div class="scroll-hint"><span>Updates populate below</span><div class="scroll-arrow"></div></div>
 </section>
+
 <section class="results-section" id="resultsSection">
   <div class="results-inner">
+    
     <div class="empty-state" id="emptyState">
       <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.35-4.35"></path></svg></div>
       <h3 class="empty-title">Profile Not Found</h3>
       <p class="empty-sub">No record matches your search parameters. Please confirm the details or reach out to our administration desk.</p>
     </div>
     
-    <div class="vehicle-card" id="vehicleCard">
+    <div class="tracker-card" id="vehicleCard">
       <div class="card-header">
-        <div class="card-header-overlay"></div>
-        <div class="card-header-content">
-          <div class="card-header-top">
-            <div class="customer-info">
-              <div class="customer-name" id="cName">—</div>
-              <div class="vehicle-plate" id="cIDNumber">—</div>
-            </div>
-            <div class="status-pill active" id="cStatusPill">Processing</div>
+        <div class="card-header-top">
+          <div>
+            <div class="customer-name" id="cName">—</div>
+            <div class="id-badge" id="cIDNumber">—</div>
           </div>
-          <div class="vehicle-meta">
-            <div class="meta-item"><span class="meta-label">Application Type</span><span class="meta-value" id="cType">—</span></div>
-            <div class="meta-item"><span class="meta-label">Reference ID</span><span class="meta-value" id="cJobId">—</span></div>
-          </div>
+          <div class="status-pill active" id="cStatusPill">Processing</div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item"><span class="meta-label">Application Type</span><span class="meta-value" id="cType">—</span></div>
+          <div class="meta-item"><span class="meta-label">Reference ID</span><span class="meta-value" id="cJobId">—</span></div>
+          <div class="meta-item"><span class="meta-label">Consultant</span><span class="meta-value" id="cStaff">—</span></div>
+          <div class="meta-item"><span class="meta-label">Date Lodged</span><span class="meta-value" id="cTimeIn">—</span></div>
         </div>
       </div>
       
-      <div class="progress-section"><p class="progress-title">Compliance Workflow Roadmap</p><div class="stage-track" id="stageTrack"></div></div>
-      <div class="eta-strip" id="etaStrip" style="display:none">
-        <div class="eta-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-        <div><div class="eta-label">Expected Finalization</div><div class="eta-message" id="cEta">—</div></div>
+      <div class="progress-section">
+        <p class="progress-title">Compliance Workflow Roadmap</p>
+        <div class="stage-track" id="stageTrack"></div>
       </div>
+      
+      <div class="eta-strip" id="etaStrip" style="display:none">
+        <div class="eta-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+        <div>
+          <div class="eta-label">Expected Finalization</div>
+          <div class="eta-message" id="cEta">—</div>
+        </div>
+      </div>
+      
       <div class="notes-strip" id="notesStrip" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         <p class="notes-text" id="cNote"></p>
       </div>
-      <div class="info-grid">
-        <div class="info-tile"><div class="info-tile-label">Assigned Consultant</div><div class="info-tile-value" id="cStaff">—</div></div>
-        <div class="info-tile"><div class="info-tile-label">Date Lodged</div><div class="info-tile-value" id="cTimeIn">—</div></div>
-        <div class="info-tile"><div class="info-tile-label">Current Step</div><div class="info-tile-value" id="cStageTile">—</div></div>
-      </div>
+      
       <div class="card-footer-bar">
-        <div class="last-updated"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg><span id="cLastUpdated">Synchronized just now</span></div>
-        <button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>Refresh Status</button>
+        <div class="last-updated">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span id="cLastUpdated">Synchronized just now</span>
+        </div>
+        <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          Refresh Data
+        </button>
       </div>
     </div>
   </div>
 </section>
-<footer class="page-footer"><div class="footer-brand">TNT ERSC Training & Tactics</div><p class="footer-copy">© 2026 TNT ERSC · All rights reserved</p></footer>
+
+<footer id="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/ERSC%20Logo.jpg" alt="ERSC Logo" />
+        <div>
+          <h5>ERSC Training & Tactics</h5>
+          <p>Professional firearm licence submissions. Secure, compliant, and handled by the ERSC team.</p>
+        </div>
+      </div>
+      <div class="partner-row">
+        <div class="partner-chip">
+          <span>Strategic Partner</span>
+          <img src="https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/ERSC%20Logo.jpg" alt="ERSC" />
+        </div>
+        <div class="partner-chip">
+          <span>Powered by</span>
+          <img src="https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/New%20logo%20transparent.png" alt="DLAM" />
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 ERSC Training & Tactics</div>
+      <div>Powered by Digital License Assist Method™</div>
+    </div>
+  </div>
+</footer>
+
 <script>
+// --- Logic & Data Handling ---
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwI5xO2njaxS3JP8Rh1Utc5gDoIbAiaqe6splx5nqQg0dbKPVEkLbJ9h9IZWFAZQ/pub?output=csv';
 
 const STAGES = [
@@ -250,7 +468,7 @@ const STAGES = [
 
 const COMPLETED_STAGES = ['Issued & Ready for Collection', 'Dispatched / Collected'];
 
-let cachedData = null, cachedAt = 0, lastSearch = { firstName:'', lastName:'', idNumber:'' }, isFetching = false;
+let cachedData = null, cachedAt = 0, isFetching = false;
 
 const clean = v => String(v || '').replace(/^\uFEFF/, '').trim();
 const normKey = v => clean(v).toLowerCase().replace(/\s+/g,' ').replace(/[^a-z0-9 ]/g,'');
@@ -335,7 +553,7 @@ function buildStageTrack(currentStage){
     
     const label=document.createElement('span'); label.className='stage-label'; label.textContent=s;
     if(i===idx){
-      const badge=document.createElement('span'); badge.className='stage-current-badge'; badge.textContent='Active';
+      const badge=document.createElement('span'); badge.className='current-badge'; badge.textContent='Active';
       label.appendChild(badge);
     }
     item.appendChild(dot); item.appendChild(label); track.appendChild(item);
@@ -348,7 +566,7 @@ function showResult(record){
   const vehicleCard=document.getElementById('vehicleCard');
   resultsSection.classList.add('visible');
   
-  if(!record){ emptyState.classList.add('visible'); vehicleCard.style.display='none'; return; }
+  if(!record){ emptyState.classList.add('visible'); vehicleCard.style.display='none'; resultsSection.scrollIntoView({ behavior:'smooth' }); return; }
   emptyState.classList.remove('visible'); vehicleCard.style.display='block';
   
   const first = g(record,'First Name') !== '—' ? g(record,'First Name') : g(record,'Name');
@@ -363,7 +581,6 @@ function showResult(record){
   document.getElementById('cJobId').textContent = g(record,'Reference ID') !== '—' ? g(record,'Reference ID') : g(record,'Job ID');
   document.getElementById('cStaff').textContent = g(record,'Assigned Consultant') !== '—' ? g(record,'Assigned Consultant') : g(record,'Staff');
   document.getElementById('cTimeIn').textContent = g(record,'Date Lodged') !== '—' ? g(record,'Date Lodged') : g(record,'Time In');
-  document.getElementById('cStageTile').textContent = canonicalStage(stage);
   
   const pill = document.getElementById('cStatusPill');
   if(COMPLETED_STAGES.map(normVal).includes(normVal(stage))) {
@@ -395,9 +612,7 @@ async function doSearch(){
   
   if(!idVal && (!fVal || !lVal)){ alert('Please provide an ID/Passport Number or both First Name & Surname.'); return; }
   
-  lastSearch = { firstName: fVal, lastName: lVal, idNumber: idVal };
   setLoading(true);
-  
   const data = await fetchData(true);
   setLoading(false);
   
