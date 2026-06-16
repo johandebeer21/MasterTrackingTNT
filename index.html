@@ -232,6 +232,7 @@ body::after {
 .status-pill { padding: 8px 16px; border-radius: 999px; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
 .status-pill.active { background: rgba(192,32,30,.15); border: 1px solid rgba(192,32,30,.3); color: var(--accent-light); }
 .status-pill.ready { background: rgba(110,233,110,.1); border: 1px solid rgba(110,233,110,.3); color: #6ee96e; }
+.status-pill.hold { background: rgba(255,165,0,.1); border: 1px solid rgba(255,165,0,.3); color: #ffa500; }
 
 .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; }
 .meta-item { display: flex; flex-direction: column; gap: 4px; }
@@ -382,9 +383,9 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
         </div>
         <div class="meta-grid">
           <div class="meta-item"><span class="meta-label">Application Type</span><span class="meta-value" id="cType">—</span></div>
-          <div class="meta-item"><span class="meta-label">Reference ID</span><span class="meta-value" id="cJobId">—</span></div>
-          <div class="meta-item"><span class="meta-label">Consultant</span><span class="meta-value" id="cStaff">—</span></div>
-          <div class="meta-item"><span class="meta-label">Date Lodged</span><span class="meta-value" id="cTimeIn">—</span></div>
+          <div class="meta-item"><span class="meta-label">Assignee</span><span class="meta-value" id="cAssignee">—</span></div>
+          <div class="meta-item"><span class="meta-label">Priority</span><span class="meta-value" id="cPriority">—</span></div>
+          <div class="meta-item"><span class="meta-label">Overall Status</span><span class="meta-value" id="cOverallStatus">—</span></div>
         </div>
       </div>
       
@@ -452,21 +453,16 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 // --- Logic & Data Handling ---
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwI5xO2njaxS3JP8Rh1Utc5gDoIbAiaqe6splx5nqQg0dbKPVEkLbJ9h9IZWFAZQ/pub?output=csv';
 
+// MAPS EXACTLY TO YOUR SHEET STAGES
 const STAGES = [
-  'Documentation Received',
-  'Profile Review & Verification',
-  'Compilation in Progress',
-  'Quality Control Assessment',
-  'Ready for Submission',
-  'Submitted to Authorities',
-  'Awaiting Reference Allocation',
-  'In Consideration Process',
-  'Final Inspection / Approval',
-  'Issued & Ready for Collection',
-  'Dispatched / Collected'
+  'Application Received',
+  'Payment Confirmed',
+  'Preparing Documents',
+  'Quality Assurance Review',
+  'Documents Ready',
+  'Documents Sent',
+  'Closed'
 ];
-
-const COMPLETED_STAGES = ['Issued & Ready for Collection', 'Dispatched / Collected'];
 
 let cachedData = null, cachedAt = 0, isFetching = false;
 
@@ -501,7 +497,7 @@ function parseCSV(text){
 }
 
 function findHeaderRow(rows){
-  const required=['id number','id','first name','name','surname','last name','application type','current stage','status'].map(normKey);
+  const required=['id number','id','first name','name','surname','last name','application type','application types','stage','stages','status','statuses'].map(normKey);
   for(let i=0;i<rows.length;i++){
     const n=rows[i].map(normKey);
     const score=required.filter(h=>n.some(header => header.includes(h) || h.includes(header))).length;
@@ -569,22 +565,31 @@ function showResult(record){
   if(!record){ emptyState.classList.add('visible'); vehicleCard.style.display='none'; resultsSection.scrollIntoView({ behavior:'smooth' }); return; }
   emptyState.classList.remove('visible'); vehicleCard.style.display='block';
   
+  // PULL SPECIFIC COLUMNS FROM YOUR TRACKER
   const first = g(record,'First Name') !== '—' ? g(record,'First Name') : g(record,'Name');
   const last = g(record,'Surname') !== '—' ? g(record,'Surname') : g(record,'Last Name');
   const idNum = g(record,'ID Number') !== '—' ? g(record,'ID Number') : g(record,'ID');
-  const stage = g(record,'Current Stage') !== '—' ? g(record,'Current Stage') : g(record,'Status');
-  const appType = g(record,'Application Type') !== '—' ? g(record,'Application Type') : g(record,'Type');
+  
+  const stage = g(record,'Stage') !== '—' ? g(record,'Stage') : (g(record,'Stages') !== '—' ? g(record,'Stages') : 'Application Received');
+  const appType = g(record,'Application Type') !== '—' ? g(record,'Application Type') : (g(record,'Application Types') !== '—' ? g(record,'Application Types') : '—');
+  const status = g(record,'Status') !== '—' ? g(record,'Status') : (g(record,'Statuses') !== '—' ? g(record,'Statuses') : 'Processing');
+  const priority = g(record,'Priority') !== '—' ? g(record,'Priority') : '—';
+  const assignee = g(record,'Assignee') !== '—' ? g(record,'Assignee') : (g(record,'Assignees') !== '—' ? g(record,'Assignees') : '—');
+  const completed = g(record,'Completed') !== '—' ? g(record,'Completed') : 'No';
   
   document.getElementById('cName').textContent = [first, last].filter(v=>v!=='—').join(' ') || 'Application Profile';
   document.getElementById('cIDNumber').textContent = 'ID/Passport: ' + idNum;
   document.getElementById('cType').textContent = appType;
-  document.getElementById('cJobId').textContent = g(record,'Reference ID') !== '—' ? g(record,'Reference ID') : g(record,'Job ID');
-  document.getElementById('cStaff').textContent = g(record,'Assigned Consultant') !== '—' ? g(record,'Assigned Consultant') : g(record,'Staff');
-  document.getElementById('cTimeIn').textContent = g(record,'Date Lodged') !== '—' ? g(record,'Date Lodged') : g(record,'Time In');
+  document.getElementById('cPriority').textContent = priority;
+  document.getElementById('cAssignee').textContent = assignee;
+  document.getElementById('cOverallStatus').textContent = status;
   
+  // Custom pill logic handling "On Hold", "Done", or "Completed"
   const pill = document.getElementById('cStatusPill');
-  if(COMPLETED_STAGES.map(normVal).includes(normVal(stage))) {
-    pill.textContent = 'Ready / Complete'; pill.className = 'status-pill ready';
+  if(normVal(completed) === 'yes' || normVal(status) === 'done' || normVal(stage) === 'closed') {
+    pill.textContent = 'Completed / Done'; pill.className = 'status-pill ready';
+  } else if(normVal(status) === 'onhold') {
+    pill.textContent = 'On Hold'; pill.className = 'status-pill hold';
   } else {
     pill.textContent = 'Processing'; pill.className = 'status-pill active';
   }
