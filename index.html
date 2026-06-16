@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TNT ERSC — Application Status Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0b0f17; --ink2:#161c26; --slate:#2c3545; --muted:#627289; --whisper:#b8c4d4;
+    --fog:#e9ecf0; --snow:#f5f7fa; --white:#fff; --gold:#c5a045; --gold2:#e5c26b; --goldp:#fbf4e2;
+    --crimson:#9e2a2b; --crimsonp:#fbebeb; --radius-md:12px; --radius-lg:20px; --radius-xl:32px;
+    --shadow-lg:0 24px 64px rgba(11,15,23,.16); --transition:all .25s ease;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'DM Sans',sans-serif;background:var(--snow);color:var(--ink);overflow-x:hidden}
+  .hero{position:relative;min-height:100vh;display:flex;flex-direction:column}
+  .hero-bg,.hero-overlay,.hero-grain{position:absolute;inset:0}
+  .hero-bg{z-index:0;background-color:var(--ink)}
+  .hero-overlay{z-index:1;background:linear-gradient(160deg,rgba(11,15,23,.95),rgba(22,28,38,.85),rgba(11,15,23,.92))}
+  .hero-grain{z-index:2;opacity:.025;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");background-size:128px}
+  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav-logo{display:flex;align-items:center;gap:14px;min-width:0}
+  .nav-logo-img{height:54px;width:auto;max-width:260px;object-fit:contain;display:block;opacity:1}
+  .nav-logo-fallback{display:none;flex-direction:column}
+  .brand-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--white);letter-spacing:.05em;line-height:1}
+  .brand-sub{font-size:10px;font-weight:600;color:var(--gold2);letter-spacing:.25em;text-transform:uppercase;margin-top:4px}
+  .nav-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);padding:8px 16px;border-radius:999px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);flex-shrink:0}
+  .nav-badge .dot{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:pulse 2s infinite ease-in-out}
+  .nav-badge span{font-size:11px;font-weight:600;color:rgba(255,255,255,.9);letter-spacing:.05em;text-transform:uppercase}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+  .hero-content{position:relative;z-index:10;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px 80px;text-align:center}
+  .hero-eyebrow{display:inline-flex;align-items:center;background:rgba(201,160,69,.12);border:1px solid rgba(201,160,69,.25);padding:6px 18px;border-radius:999px;margin-bottom:24px;animation:fadeUp .7s .2s ease forwards;opacity:0}
+  .hero-eyebrow span{font-size:11px;font-weight:600;color:var(--gold2);letter-spacing:.16em;text-transform:uppercase}
+  .hero-headline{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,6.5vw,72px);font-weight:400;color:var(--white);line-height:1.1;letter-spacing:-.01em;margin-bottom:16px;animation:fadeUp .7s .35s ease forwards;opacity:0}
+  .hero-headline em{font-style:italic;color:var(--gold2)}
+  .hero-sub{font-size:16px;font-weight:400;color:rgba(255,255,255,.6);max-width:520px;line-height:1.6;margin-bottom:44px;animation:fadeUp .7s .5s ease forwards;opacity:0}
+  .search-card{width:100%;max-width:580px;background:rgba(255,255,255,.05);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-xl);padding:36px;box-shadow:0 32px 80px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);animation:fadeUp .7s .65s ease forwards;opacity:0}
+  .search-card-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--white);margin-bottom:24px;letter-spacing:.02em}
+  .search-divider{display:flex;align-items:center;gap:14px;margin:20px 0}
+  .search-divider::before,.search-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
+  .search-divider span{font-size:11px;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:.12em;text-transform:uppercase}
+  .input-group{display:flex;gap:12px;margin-bottom:16px}
+  .input-wrap{flex:1;text-align:left}
+  .input-wrap label{display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+  .input-wrap input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-md);padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--white);outline:none;transition:var(--transition)}
+  .input-wrap input::placeholder{color:rgba(255,255,255,.25)}
+  .input-wrap input:focus{border-color:var(--gold);background:rgba(255,255,255,.1);box-shadow:0 0 0 3px rgba(197,160,69,.15)}
+  .input-solo{margin-bottom:0}
+  .input-solo .input-wrap input{letter-spacing:.08em}
+  .search-btn{width:100%;margin-top:24px;padding:16px;background:linear-gradient(135deg,var(--gold) 0%,#a68332 100%);border:none;border-radius:var(--radius-md);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:var(--ink);letter-spacing:.06em;cursor:pointer;transition:var(--transition);box-shadow:0 8px 24px rgba(197,160,69,.25);display:flex;align-items:center;justify-content:center;gap:10px}
+  .search-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(197,160,69,.38)}
+  .search-btn svg{width:18px;height:18px}
+  .scroll-hint{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;padding-bottom:32px;animation:fadeIn 1s 1.4s ease forwards;opacity:0}
+  .scroll-hint span{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px}
+  .scroll-arrow{width:1px;height:32px;background:linear-gradient(to bottom,rgba(255,255,255,.3),transparent);animation:scrollFade 1.8s infinite ease-in-out}
+  @keyframes scrollFade{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.15)}}
+  .results-section{min-height:100vh;padding:80px 24px;background:var(--snow);display:none}
+  .results-section.visible{display:block}
+  .results-inner{max-width:760px;margin:0 auto}
+  .empty-state{text-align:center;padding:80px 24px;display:none}
+  .empty-state.visible{display:block}
+  .empty-icon{width:64px;height:64px;background:var(--fog);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px}
+  .empty-icon svg{width:28px;height:28px;color:var(--muted)}
+  .empty-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:var(--ink);margin-bottom:10px}
+  .empty-sub{font-size:15px;color:var(--muted);max-width:380px;margin:0 auto;line-height:1.6}
+  
+  /* Modified Profile Card Header to fit the customized brand cover */
+  .vehicle-card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:24px;display:none;animation:cardIn .5s ease forwards}
+  @keyframes cardIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .card-header{position:relative;padding:44px 36px;background-color:var(--ink);background-image:url("https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/ersc_training_tactics_pty_ltd_cover.jpg");background-size:cover;background-position:center}
+  .card-header-overlay{position:absolute;inset:0;background:linear-gradient(to right, rgba(11,15,23,0.95) 40%, rgba(11,15,23,0.7) 100%);z-index:1}
+  .card-header-content{position:relative;z-index:2}
+  .card-header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:12px}
+  .customer-name{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:var(--white);line-height:1.1;margin-bottom:6px}
+  .vehicle-plate{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:5px 14px;border-radius:6px;font-size:13px;font-weight:600;color:var(--gold2);letter-spacing:.05em}
+  .status-pill{padding:8px 16px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+  .status-pill.active{background:rgba(201,160,69,.25);border:1px solid rgba(201,160,69,.4);color:var(--gold2);backdrop-filter:blur(4px)}
+  .status-pill.ready{background:rgba(74,222,128,.2);border:1px solid rgba(74,222,128,.4);color:#4ade80;backdrop-filter:blur(4px)}
+  .vehicle-meta{display:flex;gap:24px;flex-wrap:wrap}
+  .meta-item{display:flex;flex-direction:column;gap:3px}
+  .meta-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase}
+  .meta-value{font-size:14px;font-weight:500;color:rgba(255,255,255,.9)}
+  
+  .progress-section{padding:36px 36px 28px;border-bottom:1px solid var(--fog)}
+  .progress-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px}
+  .stage-track{position:relative;padding-left:28px}
+  .stage-track::before{content:'';position:absolute;left:9px;top:10px;bottom:10px;width:2px;background:var(--fog);border-radius:2px}
+  .stage-item{position:relative;display:flex;align-items:center;gap:16px;margin-bottom:4px;padding:10px 0}
+  .stage-dot{position:absolute;left:-28px;width:20px;height:20px;border-radius:50%;background:var(--fog);border:2px solid var(--whisper);display:flex;align-items:center;justify-content:center;transition:var(--transition);z-index:1}
+  .stage-dot svg{width:10px;height:10px;opacity:0;transition:var(--transition)}
+  .stage-label{font-size:14px;color:var(--muted);font-weight:400;transition:var(--transition)}
+  .stage-item.completed .stage-dot{background:var(--slate);border-color:var(--slate)}
+  .stage-item.completed .stage-dot svg{opacity:1;color:white}
+  .stage-item.completed .stage-label{color:var(--ink);font-weight:500}
+  .stage-item.current .stage-dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px rgba(197,160,69,.2)}
+  .stage-item.current .stage-dot svg{opacity:1;color:var(--ink)}
+  .stage-item.current .stage-label{font-weight:700;color:var(--ink);font-size:15px}
+  .stage-current-badge{display:inline-flex;align-items:center;background:var(--goldp);border:1px solid rgba(197,160,69,.3);padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;color:#7c6224;letter-spacing:.06em;margin-left:6px;text-transform:uppercase}
+  .eta-strip{padding:24px 36px;border-bottom:1px solid var(--fog);display:flex;align-items:center;gap:20px}
+  .eta-icon{width:48px;height:48px;background:var(--goldp);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center}
+  .eta-icon svg{width:22px;height:22px;color:var(--gold)}
+  .eta-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+  .eta-message{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--ink);line-height:1.3}
+  .notes-strip{padding:20px 36px;background:var(--snow);border-bottom:1px solid var(--fog);display:flex;align-items:flex-start;gap:14px}
+  .notes-strip svg{width:18px;height:18px;color:var(--muted);flex-shrink:0;margin-top:2px}
+  .notes-text{font-size:14px;color:var(--slate);line-height:1.6}
+  .info-grid{padding:28px 36px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .info-tile{background:var(--white);border-radius:var(--radius-md);padding:18px 16px;border:1px solid var(--fog)}
+  .info-tile-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+  .info-tile-value{font-size:15px;font-weight:700;color:var(--ink);line-height:1.3}
+  .card-footer-bar{padding:18px 36px;background:var(--fog);display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .last-updated{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .last-updated svg{width:14px;height:14px}
+  .refresh-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;background:var(--white);border:1px solid var(--whisper);border-radius:999px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:var(--slate);cursor:pointer;transition:var(--transition)}
+  .refresh-btn:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
+  .refresh-btn svg{width:13px;height:13px}
+  .page-footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.06);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .footer-brand{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--white);letter-spacing:.05em}
+  .footer-copy{font-size:11px;color:rgba(255,255,255,.3)}
+  .loading-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(11,15,23,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:20px}
+  .loading-overlay.visible{display:flex}
+  .loading-spinner{width:50px;height:50px;border-radius:50%;border:3px solid rgba(201,160,69,.15);border-top-color:var(--gold);animation:spin .8s linear infinite}
+  .loading-text{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white);letter-spacing:.05em}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @media (max-width:700px){
+    nav{padding:16px 20px}
+    .nav-logo-img{height:42px}
+    .search-card{padding:24px 20px}
+    .input-group{flex-direction:column;gap:16px}
+    .card-header{padding:28px 20px}
+    .card-header-top{flex-direction:column;gap:12px}
+    .progress-section,.eta-strip,.notes-strip,.info-grid,.card-footer-bar{padding:20px}
+    .info-grid{grid-template-columns:1fr 1fr}
+    .info-grid .info-tile:last-child{grid-column:span 2}
+  }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <p class="loading-text">Locating your application profile...</p>
+</div>
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-overlay"></div>
+    <div class="hero-grain"></div>
+  </div>
+  <nav>
+    <div class="nav-logo">
+      <img id="navLogo" class="nav-logo-img" src="https://raw.githubusercontent.com/johandebeer21/ERSC-licensing-portal/main/New%20logo%20transparent.png" alt="TNT ERSC" onload="this.style.opacity='1'" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';" />
+      <div class="nav-logo-fallback" id="logoFallback">
+        <span class="brand-name">TNT ERSC</span>
+        <span class="brand-sub">Training & Tactics</span>
+      </div>
+    </div>
+    <div class="nav-badge"><div class="dot"></div><span>Live Status System</span></div>
+  </nav>
+  <div class="hero-content">
+    <div class="hero-eyebrow"><span>✦ Secure Verification Portal</span></div>
+    <h1 class="hero-headline">Track Your Application<br /><em>In Real Time</em></h1>
+    <p class="hero-sub">Review your status, active compliance checks, and regulatory steps dynamically directly from our live database.</p>
+    <div class="search-card">
+      <p class="search-card-title">Application Lookup</p>
+      <div class="input-group">
+        <div class="input-wrap"><label for="firstName">First Name</label><input id="firstName" type="text" placeholder="e.g. Johan" /></div>
+        <div class="input-wrap"><label for="lastName">Surname</label><input id="lastName" type="text" placeholder="e.g. De Beer" /></div>
+      </div>
+      <div class="search-divider"><span>or verify via identifier</span></div>
+      <div class="input-group input-solo">
+        <div class="input-wrap"><label for="idNumber">ID / Passport Number</label><input id="idNumber" type="text" placeholder="e.g. 9512285187084" /></div>
+      </div>
+      <button class="search-btn" id="searchBtn" onclick="doSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.35-4.35"></path></svg>
+        Verify Status
+      </button>
+    </div>
+  </div>
+  <div class="scroll-hint"><span>Updates populate below</span><div class="scroll-arrow"></div></div>
+</section>
+<section class="results-section" id="resultsSection">
+  <div class="results-inner">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.35-4.35"></path></svg></div>
+      <h3 class="empty-title">Profile Not Found</h3>
+      <p class="empty-sub">No record matches your search parameters. Please confirm the details or reach out to our administration desk.</p>
+    </div>
+    
+    <div class="vehicle-card" id="vehicleCard">
+      <div class="card-header">
+        <div class="card-header-overlay"></div>
+        <div class="card-header-content">
+          <div class="card-header-top">
+            <div class="customer-info">
+              <div class="customer-name" id="cName">—</div>
+              <div class="vehicle-plate" id="cIDNumber">—</div>
+            </div>
+            <div class="status-pill active" id="cStatusPill">Processing</div>
+          </div>
+          <div class="vehicle-meta">
+            <div class="meta-item"><span class="meta-label">Application Type</span><span class="meta-value" id="cType">—</span></div>
+            <div class="meta-item"><span class="meta-label">Reference ID</span><span class="meta-value" id="cJobId">—</span></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="progress-section"><p class="progress-title">Compliance Workflow Roadmap</p><div class="stage-track" id="stageTrack"></div></div>
+      <div class="eta-strip" id="etaStrip" style="display:none">
+        <div class="eta-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+        <div><div class="eta-label">Expected Finalization</div><div class="eta-message" id="cEta">—</div></div>
+      </div>
+      <div class="notes-strip" id="notesStrip" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <p class="notes-text" id="cNote"></p>
+      </div>
+      <div class="info-grid">
+        <div class="info-tile"><div class="info-tile-label">Assigned Consultant</div><div class="info-tile-value" id="cStaff">—</div></div>
+        <div class="info-tile"><div class="info-tile-label">Date Lodged</div><div class="info-tile-value" id="cTimeIn">—</div></div>
+        <div class="info-tile"><div class="info-tile-label">Current Step</div><div class="info-tile-value" id="cStageTile">—</div></div>
+      </div>
+      <div class="card-footer-bar">
+        <div class="last-updated"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg><span id="cLastUpdated">Synchronized just now</span></div>
+        <button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>Refresh Status</button>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="page-footer"><div class="footer-brand">TNT ERSC Training & Tactics</div><p class="footer-copy">© 2026 TNT ERSC · All rights reserved</p></footer>
+<script>
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwI5xO2njaxS3JP8Rh1Utc5gDoIbAiaqe6splx5nqQg0dbKPVEkLbJ9h9IZWFAZQ/pub?output=csv';
+
+const STAGES = [
+  'Documentation Received',
+  'Profile Review & Verification',
+  'Compilation in Progress',
+  'Quality Control Assessment',
+  'Ready for Submission',
+  'Submitted to Authorities',
+  'Awaiting Reference Allocation',
+  'In Consideration Process',
+  'Final Inspection / Approval',
+  'Issued & Ready for Collection',
+  'Dispatched / Collected'
+];
+
+const COMPLETED_STAGES = ['Issued & Ready for Collection', 'Dispatched / Collected'];
+
+let cachedData = null, cachedAt = 0, lastSearch = { firstName:'', lastName:'', idNumber:'' }, isFetching = false;
+
+const clean = v => String(v || '').replace(/^\uFEFF/, '').trim();
+const normKey = v => clean(v).toLowerCase().replace(/\s+/g,' ').replace(/[^a-z0-9 ]/g,'');
+const normVal = v => clean(v).toLowerCase().replace(/\s+/g,'');
+const g = (r, k) => { const v = r[normKey(k)]; return v && String(v).trim() !== '' ? String(v).trim() : '—'; };
+
+function canonicalStage(raw) {
+  const s = normVal(raw);
+  if (!s) return STAGES[0];
+  const matched = STAGES.find(st => normVal(st) === s || s.includes(normVal(st)));
+  return matched || STAGES[0];
+}
+
+function setLoading(show){ document.getElementById('loadingOverlay').classList.toggle('visible', show); }
+
+function parseCSV(text){
+  const rows=[]; let row=[], cell='', q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(c==='"'){ if(q&&n==='"'){cell+='"'; i++;} else q=!q; }
+    else if(c===','&&!q){ row.push(cell); cell=''; }
+    else if((c==='\n'||c==='\r')&&!q){
+      if(c==='\r'&&n==='\n') i++; row.push(cell);
+      if(row.some(v=>String(v).trim())) rows.push(row);
+      row=[]; cell='';
+    } else cell+=c;
+  }
+  row.push(cell); if(row.some(v=>String(v).trim())) rows.push(row);
+  return rows;
+}
+
+function findHeaderRow(rows){
+  const required=['id number','id','first name','name','surname','last name','application type','current stage','status'].map(normKey);
+  for(let i=0;i<rows.length;i++){
+    const n=rows[i].map(normKey);
+    const score=required.filter(h=>n.some(header => header.includes(h) || h.includes(header))).length;
+    if(score>=2) return i;
+  }
+  return 0;
+}
+
+function mapRow(headers,row){ const o={}; headers.forEach((h,i)=>o[h]=(row[i] ?? '').toString().trim()); return o; }
+
+async function fetchSnapshot(){
+  const url = CSV_URL + (CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+  const res = await fetch(url, { cache:'no-store' });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  const rows = parseCSV(await res.text());
+  const headerIndex = findHeaderRow(rows);
+  const headers = rows[headerIndex].map(normKey);
+  return rows.slice(headerIndex + 1).map(r => mapRow(headers, r)).filter(r => Object.values(r).some(v => String(v).trim() !== ''));
+}
+
+async function fetchData(forceFresh=false){
+  if(!forceFresh && cachedData && (Date.now() - cachedAt < 15000)) return cachedData;
+  if(isFetching) return cachedData || [];
+  isFetching = true;
+  try {
+    const data = await fetchSnapshot();
+    if(data) { cachedData = data; cachedAt = Date.now(); }
+    return cachedData || [];
+  } catch(err) {
+    console.error(err);
+    return cachedData || [];
+  } finally { isFetching = false; }
+}
+
+function buildStageTrack(currentStage){
+  const track=document.getElementById('stageTrack'); track.innerHTML='';
+  const canonical = canonicalStage(currentStage);
+  const currentIdx = STAGES.findIndex(s => normVal(s) === normVal(canonical));
+  const idx = currentIdx === -1 ? 0 : currentIdx;
+  
+  STAGES.forEach((s,i)=>{
+    const item=document.createElement('div'); item.className='stage-item';
+    if(i<idx) item.classList.add('completed');
+    if(i===idx) item.classList.add('current');
+    
+    const dot=document.createElement('div'); dot.className='stage-dot';
+    if(i<idx) dot.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    else if(i===idx) dot.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"></circle></svg>`;
+    
+    const label=document.createElement('span'); label.className='stage-label'; label.textContent=s;
+    if(i===idx){
+      const badge=document.createElement('span'); badge.className='stage-current-badge'; badge.textContent='Active';
+      label.appendChild(badge);
+    }
+    item.appendChild(dot); item.appendChild(label); track.appendChild(item);
+  });
+}
+
+function showResult(record){
+  const resultsSection=document.getElementById('resultsSection');
+  const emptyState=document.getElementById('emptyState');
+  const vehicleCard=document.getElementById('vehicleCard');
+  resultsSection.classList.add('visible');
+  
+  if(!record){ emptyState.classList.add('visible'); vehicleCard.style.display='none'; return; }
+  emptyState.classList.remove('visible'); vehicleCard.style.display='block';
+  
+  const first = g(record,'First Name') !== '—' ? g(record,'First Name') : g(record,'Name');
+  const last = g(record,'Surname') !== '—' ? g(record,'Surname') : g(record,'Last Name');
+  const idNum = g(record,'ID Number') !== '—' ? g(record,'ID Number') : g(record,'ID');
+  const stage = g(record,'Current Stage') !== '—' ? g(record,'Current Stage') : g(record,'Status');
+  const appType = g(record,'Application Type') !== '—' ? g(record,'Application Type') : g(record,'Type');
+  
+  document.getElementById('cName').textContent = [first, last].filter(v=>v!=='—').join(' ') || 'Application Profile';
+  document.getElementById('cIDNumber').textContent = 'ID/Passport: ' + idNum;
+  document.getElementById('cType').textContent = appType;
+  document.getElementById('cJobId').textContent = g(record,'Reference ID') !== '—' ? g(record,'Reference ID') : g(record,'Job ID');
+  document.getElementById('cStaff').textContent = g(record,'Assigned Consultant') !== '—' ? g(record,'Assigned Consultant') : g(record,'Staff');
+  document.getElementById('cTimeIn').textContent = g(record,'Date Lodged') !== '—' ? g(record,'Date Lodged') : g(record,'Time In');
+  document.getElementById('cStageTile').textContent = canonicalStage(stage);
+  
+  const pill = document.getElementById('cStatusPill');
+  if(COMPLETED_STAGES.map(normVal).includes(normVal(stage))) {
+    pill.textContent = 'Ready / Complete'; pill.className = 'status-pill ready';
+  } else {
+    pill.textContent = 'Processing'; pill.className = 'status-pill active';
+  }
+  
+  buildStageTrack(stage);
+  
+  const eta = g(record,'Expected Finalization') !== '—' ? g(record,'Expected Finalization') : g(record,'ETA');
+  const etaStrip = document.getElementById('etaStrip');
+  if(eta && eta !== '—') { etaStrip.style.display='flex'; document.getElementById('cEta').textContent=eta; }
+  else { etaStrip.style.display='none'; }
+  
+  const note = g(record,'Status Note') !== '—' ? g(record,'Status Note') : g(record,'Notes');
+  const notesStrip = document.getElementById('notesStrip');
+  if(note && note !== '—') { notesStrip.style.display='flex'; document.getElementById('cNote').textContent=note; }
+  else { notesStrip.style.display='none'; }
+  
+  document.getElementById('cLastUpdated').textContent = 'Synchronized: ' + (g(record,'Last Updated') !== '—' ? g(record,'Last Updated') : 'Just Now');
+  resultsSection.scrollIntoView({ behavior:'smooth' });
+}
+
+async function doSearch(){
+  const fVal = normVal(document.getElementById('firstName').value);
+  const lVal = normVal(document.getElementById('lastName').value);
+  const idVal = normVal(document.getElementById('idNumber').value);
+  
+  if(!idVal && (!fVal || !lVal)){ alert('Please provide an ID/Passport Number or both First Name & Surname.'); return; }
+  
+  lastSearch = { firstName: fVal, lastName: lVal, idNumber: idVal };
+  setLoading(true);
+  
+  const data = await fetchData(true);
+  setLoading(false);
+  
+  let match = null;
+  if(data && data.length > 0) {
+    match = data.find(r => {
+      const rowID = normVal(g(r,'ID Number') !== '—' ? g(r,'ID Number') : g(r,'ID'));
+      const rowFirst = normVal(g(r,'First Name') !== '—' ? g(r,'First Name') : g(r,'Name'));
+      const rowLast = normVal(g(r,'Surname') !== '—' ? g(r,'Surname') : g(r,'Last Name'));
+      
+      if(idVal && rowID && rowID === idVal) return true;
+      if(fVal && lVal && rowFirst === fVal && rowLast === lVal) return true;
+      return false;
+    });
+  }
+  showResult(match);
+}
+
+async function refreshData(){
+  const btn = document.getElementById('refreshBtn');
+  btn.style.opacity = '0.5'; btn.disabled = true;
+  await doSearch();
+  btn.style.opacity = '1'; btn.disabled = false;
+}
+</script>
+</body>
+</html>
