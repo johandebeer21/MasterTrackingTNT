@@ -21,6 +21,10 @@
   --muted: #8a8484;
   --accent: #c0201e;
   --accent-light: #e8403e;
+  --done: #4f9d6e;
+  --progress: #4c85b0;
+  --hold: #ffa500;
+  --idle: #7a8087;
   --shadow-deep: 0 32px 80px rgba(0,0,0,.60);
   --r: 20px;
   --r-sm: 12px;
@@ -96,7 +100,7 @@ body::after {
 .results-inner { max-width: 760px; margin: 0 auto; }
 
 .empty-state { text-align: center; padding: 60px 24px; display: none; }
-.empty-state.visible { display: block; }
+.empty-state.visible { display: block; animation: fadeUp .5s ease both; }
 .empty-icon { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 20px; display: grid; place-items: center; background: rgba(255,255,255,.03); border: 1px solid var(--border); }
 .empty-icon svg { width: 28px; height: 28px; color: var(--muted); }
 .empty-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: .05em; color: var(--text); margin-bottom: 10px; }
@@ -108,47 +112,80 @@ body::after {
 .error-banner p { color: var(--accent-light); font-size: .85rem; line-height: 1.6; }
 .error-banner code { font-family: monospace; font-size: .8rem; background: rgba(0,0,0,.3); padding: 2px 6px; border-radius: 4px; }
 
-.tracker-card { background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-deep); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: none; animation: fadeUp .5s ease forwards; }
+.tracker-card { background: var(--surface); border: 1px solid var(--border-2); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-deep); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); display: none; }
+.tracker-card.anim-in { animation: cardIn .6s cubic-bezier(.16,1,.3,1) both; }
 .card-header { padding: 32px 36px; background: rgba(0,0,0,.4); border-bottom: 1px solid var(--border); }
 .card-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; gap: 12px; }
 .customer-name { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; letter-spacing: .03em; line-height: 1; margin-bottom: 8px; color: var(--text); }
 .id-badge { display: inline-block; background: rgba(255,255,255,.06); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: .8rem; font-weight: 600; letter-spacing: .05em; color: var(--muted); }
-.status-pill { padding: 8px 16px; border-radius: 999px; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.status-pill { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 999px; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; transition: background-color .3s, border-color .3s, color .3s; }
 .status-pill.active { background: rgba(192,32,30,.15); border: 1px solid rgba(192,32,30,.3); color: var(--accent-light); }
 .status-pill.ready { background: rgba(110,233,110,.1); border: 1px solid rgba(110,233,110,.3); color: #6ee96e; }
 .status-pill.hold { background: rgba(255,165,0,.1); border: 1px solid rgba(255,165,0,.3); color: #ffa500; }
+.pill-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: dotPulse 1.6s ease-in-out infinite; }
+.pill-check { display: inline-block; animation: popIn .45s cubic-bezier(.34,1.56,.64,1) both; }
 .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; }
 .meta-item { display: flex; flex-direction: column; gap: 4px; }
 .meta-label { font-size: .65rem; font-weight: 700; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
 .meta-value { font-size: .95rem; font-weight: 500; color: var(--text); }
 
-.progress-section { padding: 36px; border-bottom: 1px solid var(--border); }
-.progress-title { font-size: .75rem; font-weight: 700; color: var(--accent-light); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 28px; }
-.stage-track { position: relative; padding-left: 28px; }
-.stage-track::before { content:''; position: absolute; left: 9px; top: 10px; bottom: 10px; width: 2px; background: rgba(255,255,255,.06); border-radius: 2px; }
-.stage-item { position: relative; display: flex; align-items: center; gap: 16px; margin-bottom: 8px; padding: 6px 0; }
-.stage-dot { position: absolute; left: -28px; width: 20px; height: 20px; border-radius: 50%; background: #111; border: 2px solid var(--border-2); display: grid; place-items: center; z-index: 1; transition: all .3s; }
-.stage-dot svg { width: 10px; height: 10px; opacity: 0; color: #fff; }
-.stage-label { font-size: .95rem; color: var(--muted); transition: all .3s; }
-.stage-item.completed .stage-dot { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.3); }
-.stage-item.completed .stage-dot svg { opacity: 1; }
-.stage-item.completed .stage-label { color: #d0cdc8; }
-.stage-item.current .stage-dot { background: var(--accent); border-color: var(--accent-light); box-shadow: 0 0 12px rgba(192,32,30,.4); }
-.stage-item.current .stage-dot svg { opacity: 1; color: #1a0000; }
-.stage-item.current .stage-label { font-weight: 700; color: var(--text); }
-.current-badge { display: inline-block; margin-left: 8px; font-size: .65rem; font-weight: 700; color: var(--accent-light); border: 1px solid rgba(192,32,30,.3); background: rgba(192,32,30,.1); padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .08em; }
+/* ── Progress bar + stage dots ─────────────────────── */
+.progress-block { padding: 28px 36px; border-bottom: 1px solid var(--border); }
+.progress-title { font-size: .75rem; font-weight: 700; color: var(--accent-light); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; }
+.progress-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; gap: 12px; }
+.progress-row span:first-child { font-size: .72rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+.progress-row span:last-child { font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: .04em; color: var(--text); text-align: right; }
+.progress-track { height: 8px; border-radius: 999px; background: rgba(255,255,255,.06); overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius: 999px; transition: width 1s cubic-bezier(.16,1,.3,1); box-shadow: 0 0 10px rgba(232,64,62,.45); }
+.stage-track { display: flex; justify-content: space-between; margin-top: 14px; gap: 4px; }
+.stage-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.stage-dot { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,.08); border: 2px solid var(--border-2); transition: background-color .4s ease, border-color .4s ease, transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .4s ease; }
+.stage-label { font-size: .6rem; color: var(--muted); text-align: center; line-height: 1.25; letter-spacing: .01em; }
+.stage-dot-wrap.reached .stage-dot { background: var(--accent-light); border-color: var(--accent-light); }
+.stage-dot-wrap.reached .stage-label { color: #d0cdc8; }
+.stage-dot-wrap.current .stage-dot { transform: scale(1.35); box-shadow: 0 0 0 4px rgba(232,64,62,.22); animation: stagePulse 1.8s ease-in-out infinite; }
+.stage-dot-wrap.current .stage-label { color: var(--accent-light); font-weight: 700; }
+@keyframes stagePulse { 0%,100% { box-shadow: 0 0 0 4px rgba(232,64,62,.22); } 50% { box-shadow: 0 0 0 8px rgba(232,64,62,0); } }
+.count-strip { display: flex; gap: 22px; margin-top: 16px; flex-wrap: wrap; }
+.count-item { display: flex; align-items: center; gap: 7px; font-size: .8rem; color: var(--muted); }
+.count-dot { width: 8px; height: 8px; border-radius: 50%; }
+.count-dot.done { background: var(--done); }
+.count-dot.progress { background: var(--progress); }
+.count-dot.hold { background: var(--hold); }
+.count-dot.idle { background: var(--idle); }
 
-.eta-strip { padding: 24px 36px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 20px; background: rgba(255,255,255,.01); }
-.eta-icon { width: 48px; height: 48px; background: rgba(192,32,30,.1); border: 1px solid rgba(192,32,30,.2); border-radius: 12px; display: grid; place-items: center; }
-.eta-icon svg { width: 22px; height: 22px; color: var(--accent-light); }
-.eta-label { font-size: .65rem; font-weight: 700; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 4px; }
-.eta-message { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: .03em; color: var(--text); line-height: 1; }
+/* ── Application items ledger ──────────────────────── */
+.ledger { padding: 8px 0; }
+.ledger-title { padding: 20px 36px 4px; font-size: .72rem; font-weight: 700; color: var(--accent-light); letter-spacing: .14em; text-transform: uppercase; }
+.ledger-row { display: flex; align-items: center; gap: 18px; padding: 18px 36px; border-top: 1px solid var(--border); opacity: 0; transform: translateY(10px); transition: opacity .45s ease, transform .45s ease; }
+.ledger-row.in { opacity: 1; transform: translateY(0); }
+.ledger-icon { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; border: 2px solid var(--idle); transition: background-color .3s, border-color .3s; }
+.ledger-icon svg { width: 14px; height: 14px; opacity: 0; color: #0b0d0f; }
+.ledger-icon svg polyline { stroke-dasharray: 22; stroke-dashoffset: 22; transition: stroke-dashoffset .4s ease .15s; }
+.ledger-row.is-done .ledger-icon { background: var(--done); border-color: var(--done); }
+.ledger-row.is-done .ledger-icon svg { opacity: 1; }
+.ledger-row.is-done.in .ledger-icon svg polyline { stroke-dashoffset: 0; }
+.ledger-row.is-progress .ledger-icon { border-color: var(--progress); animation: dotPulse 2s ease-in-out infinite; }
+.ledger-row.is-hold .ledger-icon { border-color: var(--hold); }
+.ledger-body { flex: 1; min-width: 0; }
+.ledger-desc { font-size: .98rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.ledger-meta { font-size: .78rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 10px; }
+.ledger-meta b { color: #d0cdc8; font-weight: 600; }
+.ledger-right { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; flex-shrink: 0; }
+.ledger-status { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+.ledger-status.done { color: var(--done); background: rgba(79,157,110,.1); border: 1px solid rgba(79,157,110,.3); }
+.ledger-status.progress { color: #8bc0e6; background: rgba(76,133,176,.12); border: 1px solid rgba(76,133,176,.35); }
+.ledger-status.hold { color: var(--hold); background: rgba(255,165,0,.1); border: 1px solid rgba(255,165,0,.3); }
+.ledger-status.idle { color: #c7cbcf; background: rgba(255,255,255,.04); border: 1px solid var(--border-2); }
+.ledger-due { display: flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 700; letter-spacing: .02em; color: var(--muted); white-space: nowrap; padding: 5px 11px; border-radius: 999px; background: rgba(255,255,255,.04); border: 1px solid var(--border-2); transform: scale(.7); opacity: 0; transition: transform .5s cubic-bezier(.34,1.56,.64,1), opacity .4s ease; }
+.ledger-due.due-in { transform: scale(1); opacity: 1; }
+.ledger-due svg { width: 12px; height: 12px; flex-shrink: 0; }
+.due-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: dotPulse 1.4s ease-in-out infinite; }
+.ledger-due.soon { color: #ffb3b3; border-color: rgba(232,64,62,.4); background: rgba(232,64,62,.08); }
+.ledger-due.overdue { color: var(--accent-light); border-color: rgba(232,64,62,.55); background: rgba(192,32,30,.14); animation: dueGlow 1.8s ease-in-out infinite; }
+@keyframes dueGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(232,64,62,.35); } 50% { box-shadow: 0 0 0 7px rgba(232,64,62,0); } }
 
-.notes-strip { padding: 20px 36px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 14px; background: rgba(0,0,0,.2); }
-.notes-strip svg { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; margin-top: 2px; }
-.notes-text { font-size: .9rem; color: #d0cdc8; line-height: 1.6; }
-
-.card-footer-bar { padding: 20px 36px; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.card-footer-bar { padding: 20px 36px; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-top: 1px solid var(--border); }
 .last-updated { display: flex; align-items: center; gap: 8px; font-size: .75rem; color: var(--muted); }
 .last-updated svg { width: 14px; height: 14px; }
 .refresh-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 999px; font-family: 'DM Sans', sans-serif; font-size: .75rem; font-weight: 700; color: var(--text); cursor: pointer; transition: all .2s; letter-spacing: .05em; text-transform: uppercase; }
@@ -175,13 +212,28 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 .loading-text { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: .05em; color: var(--text); }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes cardIn { from { opacity: 0; transform: translateY(22px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes dotPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: .45; } }
+@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-dot-wrap.current .stage-dot, .ledger-due, .due-dot, .ledger-row.is-progress .ledger-icon { animation: none !important; }
+  .ledger-due { transition: none !important; }
+}
 
 @media (max-width: 768px) {
   .input-group { flex-direction: column; gap: 16px; }
-  .card-header, .progress-section, .eta-strip, .notes-strip, .card-footer-bar { padding: 24px; }
+  .card-header, .progress-block, .card-footer-bar { padding: 24px; }
+  .ledger-title { padding-left: 24px; padding-right: 24px; }
+  .ledger-row { padding: 16px 24px; flex-wrap: wrap; }
+  .ledger-right { flex-direction: row; align-items: center; gap: 12px; }
   .card-header-top { flex-direction: column; }
   .footer-top { grid-template-columns: 1fr; }
   .partner-row { justify-content: flex-start; }
+}
+@media (max-width: 600px) {
+  .stage-label { display: none; }
+  .stage-track { margin-top: 10px; }
 }
 @media (max-width: 480px) {
   :root { --nav-h: 60px; }
@@ -273,22 +325,22 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
         </div>
       </div>
 
-      <div class="progress-section">
+      <div class="progress-block">
         <p class="progress-title">Compliance Workflow Roadmap</p>
+        <div class="progress-row"><span>Application Progress</span><span id="progressText">—</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
         <div class="stage-track" id="stageTrack"></div>
-      </div>
-
-      <div class="eta-strip" id="etaStrip" style="display:none">
-        <div class="eta-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-        <div>
-          <div class="eta-label">Due Date</div>
-          <div class="eta-message" id="cEta">—</div>
+        <div class="count-strip">
+          <div class="count-item"><span class="count-dot done"></span><span id="countDone">0 done</span></div>
+          <div class="count-item"><span class="count-dot progress"></span><span id="countProgress">0 in progress</span></div>
+          <div class="count-item" id="countHoldWrap" style="display:none"><span class="count-dot hold"></span><span id="countHold">0 on hold</span></div>
+          <div class="count-item"><span class="count-dot idle"></span><span id="countIdle">0 not started</span></div>
         </div>
       </div>
 
-      <div class="notes-strip" id="notesStrip" style="display:none">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-        <p class="notes-text" id="cNote"></p>
+      <div class="ledger">
+        <p class="ledger-title">Application items</p>
+        <div id="ledgerRows"></div>
       </div>
 
       <div class="card-footer-bar">
@@ -334,6 +386,12 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 </footer>
 
 <script>
+// ── SCROLL RESET ─────────────────────────────────────────────────────────────
+// Browsers restore scroll position on refresh by default — force back to top.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.addEventListener('load', () => window.scrollTo(0, 0));
+window.scrollTo(0, 0);
+
 // ── CONFIG ───────────────────────────────────────────────────────────────────
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwI5xO2njaxS3JP8Rh1Utc5gDoIbAiaqe6splx5nqQg0dbKPVEkLbJ9h9IZWFAZQ/pub?output=csv';
 
@@ -352,6 +410,18 @@ const STAGES = [
 const normKey = h => String(h || '').replace(/^\uFEFF/, '').trim().toLowerCase().replace(/\s+/g, ' ');
 // Strip everything non-alphanumeric — used for value comparisons
 const normVal = v => String(v || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// ── PIPELINE STAGE MATCHING ──────────────────────────────────────────────────
+const STAGE_KEYS = STAGES.map(normVal);
+function findStageIndex(raw) {
+  const k = normVal(raw);
+  if (!k) return -1;
+  let idx = STAGE_KEYS.indexOf(k);
+  if (idx !== -1) return idx;
+  // fallback: partial match in case the sheet text has extra words
+  return STAGE_KEYS.findIndex(sk => k.includes(sk) || sk.includes(k));
+}
 
 // ── COLUMN RESOLVER ──────────────────────────────────────────────────────────
 // After parsing, we resolve column keys once and reuse them.
@@ -401,7 +471,7 @@ function getField(row, colMap, key) {
   return (v !== undefined && String(v).trim() !== '') ? String(v).trim() : '—';
 }
 
-// ── DATE HELPER ──────────────────────────────────────────────────────────────
+// ── DATE HELPERS ─────────────────────────────────────────────────────────────
 function excelDateToString(serial) {
   if (!serial || serial === '—') return serial;
   // Already a readable date string (contains letters or slashes)
@@ -411,6 +481,20 @@ function excelDateToString(serial) {
   const date = new Date((num - 25569) * 86400 * 1000);
   if (isNaN(date.getTime())) return serial;
   return date.toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function parseAnyDate(raw) {
+  if (!raw || raw === '—') return null;
+  const s = String(raw).trim();
+  if (/^[0-9]+(\.[0-9]+)?$/.test(s)) {
+    const num = parseFloat(s);
+    if (!isNaN(num) && num > 1) {
+      const d = new Date((num - 25569) * 86400 * 1000);
+      if (!isNaN(d.getTime())) return d;
+    }
+  }
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
 }
 
 // ── CSV PARSER ───────────────────────────────────────────────────────────────
@@ -512,9 +596,10 @@ function normaliseId(raw) {
   return s.replace(/[^0-9a-z]/gi, '').toLowerCase();
 }
 
-function findMatch(rows, colMap, fVal, lVal, idVal) {
-  if (!rows || !rows.length) return null;
-  return rows.find(r => {
+// Returns ALL rows belonging to the matched client (an application can span many items)
+function findClientRows(rows, colMap, fVal, lVal, idVal) {
+  if (!rows || !rows.length) return [];
+  return rows.filter(r => {
     const rowId    = normaliseId(getField(r, colMap, 'clientId'));
     const rowFirst = normVal(getField(r, colMap, 'firstName'));
     const rowLast  = normVal(getField(r, colMap, 'surname'));
@@ -541,60 +626,34 @@ function showError(msg) {
   }
 }
 
-// ── STAGE RENDERER ────────────────────────────────────────────────────────────
-function buildStageTrack(rawStage) {
-  const track = document.getElementById('stageTrack');
-  track.innerHTML = '';
+function statusClass(status) {
+  const n = normVal(status);
+  if (n === 'done') return 'done';
+  if (n === 'inprogress') return 'progress';
+  if (n === 'onhold') return 'hold';
+  return 'idle';
+}
 
-  const normalized = normVal(rawStage);
-  let currentIdx = STAGES.findIndex(s => normVal(s) === normalized);
-  // Partial fallback
-  if (currentIdx === -1) currentIdx = STAGES.findIndex(s => normalized.includes(normVal(s)) || normVal(s).includes(normalized));
-  if (currentIdx === -1) {
-    console.warn('[ERSC] Could not match stage:', rawStage, '→ normalized:', normalized);
-    currentIdx = 0;
+function animateNumber(el, to, suffix, duration) {
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(to * eased) + suffix;
+    if (p < 1) requestAnimationFrame(tick);
   }
-
-  STAGES.forEach((s, i) => {
-    const item = document.createElement('div');
-    item.className = 'stage-item';
-    if (i < currentIdx) item.classList.add('completed');
-    if (i === currentIdx) item.classList.add('current');
-
-    const dot = document.createElement('div');
-    dot.className = 'stage-dot';
-    if (i < currentIdx) {
-      dot.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-    } else if (i === currentIdx) {
-      dot.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"></circle></svg>`;
-    }
-
-    const label = document.createElement('span');
-    label.className = 'stage-label';
-    label.textContent = s;
-
-    if (i === currentIdx) {
-      const badge = document.createElement('span');
-      badge.className = 'current-badge';
-      badge.textContent = 'Active';
-      label.appendChild(badge);
-    }
-
-    item.appendChild(dot);
-    item.appendChild(label);
-    track.appendChild(item);
-  });
+  requestAnimationFrame(tick);
 }
 
 // ── DISPLAY ───────────────────────────────────────────────────────────────────
-function showResult(record, colMap) {
+function showResult(matchRows, colMap) {
   const resultsSection = document.getElementById('resultsSection');
   const emptyState     = document.getElementById('emptyState');
   const vehicleCard    = document.getElementById('vehicleCard');
 
   resultsSection.classList.add('visible');
 
-  if (!record) {
+  if (!matchRows || !matchRows.length) {
     emptyState.classList.add('visible');
     vehicleCard.style.display = 'none';
     resultsSection.scrollIntoView({ behavior: 'smooth' });
@@ -603,21 +662,20 @@ function showResult(record, colMap) {
 
   emptyState.classList.remove('visible');
   vehicleCard.style.display = 'block';
+  vehicleCard.classList.remove('anim-in');
+  void vehicleCard.offsetWidth; // force reflow so the entrance animation replays on repeat searches
+  vehicleCard.classList.add('anim-in');
 
-  const firstName   = getField(record, colMap, 'firstName');
-  const surname     = getField(record, colMap, 'surname');
-  const clientId    = getField(record, colMap, 'clientId');
-  const stage       = getField(record, colMap, 'currentStage');
-  const appType     = getField(record, colMap, 'appType');
-  const status      = getField(record, colMap, 'status');
-  const priority    = getField(record, colMap, 'priority');
-  const assignee    = getField(record, colMap, 'assignee');
-  const completed   = getField(record, colMap, 'completed');
-  const dueDate     = getField(record, colMap, 'dueDate');
-  const description = getField(record, colMap, 'description');
-  const updatedAt   = getField(record, colMap, 'updatedAt');
+  const record    = matchRows[0];
+  const firstName = getField(record, colMap, 'firstName');
+  const surname   = getField(record, colMap, 'surname');
+  const clientId  = getField(record, colMap, 'clientId');
+  const appType   = getField(record, colMap, 'appType');
+  const status    = getField(record, colMap, 'status');
+  const priority  = getField(record, colMap, 'priority');
+  const assignee  = getField(record, colMap, 'assignee');
 
-  console.log('[ERSC] Rendering record —', { firstName, surname, clientId, stage, status });
+  console.log('[ERSC] Rendering client —', { firstName, surname, clientId, items: matchRows.length });
 
   const fullName = [firstName, surname].filter(v => v !== '—').join(' ') || 'Application Profile';
   document.getElementById('cName').textContent    = fullName;
@@ -627,42 +685,134 @@ function showResult(record, colMap) {
   document.getElementById('cAssignee').textContent      = assignee;
   document.getElementById('cOverallStatus').textContent = status;
 
+  // Counts across all of this client's items
+  let doneCount = 0, progressCount = 0, holdCount = 0, idleCount = 0;
+  matchRows.forEach(r => {
+    const s = statusClass(getField(r, colMap, 'status'));
+    const completedYes = normVal(getField(r, colMap, 'completed')) === 'yes';
+    if (s === 'done' || completedYes) doneCount++;
+    else if (s === 'progress') progressCount++;
+    else if (s === 'hold') holdCount++;
+    else idleCount++;
+  });
+  const total = matchRows.length;
+
+  // Furthest pipeline stage reached across this client's rows
+  let stageIdx = -1;
+  matchRows.forEach(r => {
+    const idx = findStageIndex(getField(r, colMap, 'currentStage'));
+    if (idx > stageIdx) stageIdx = idx;
+  });
+  const stagePct = stageIdx >= 0 ? Math.round(((stageIdx + 1) / STAGES.length) * 100) : 0;
+
+  // Progress bar
+  const progressFill = document.getElementById('progressFill');
+  progressFill.style.width = '0%';
+  requestAnimationFrame(() => requestAnimationFrame(() => { progressFill.style.width = stagePct + '%'; }));
+
+  document.getElementById('progressText').textContent = stageIdx >= 0
+    ? STAGES[stageIdx] + '  ·  ' + (stageIdx + 1) + ' / ' + STAGES.length
+    : 'Not started';
+
+  // Stage dot track
+  document.getElementById('stageTrack').innerHTML = STAGES.map((label, i) => {
+    const cls = i < stageIdx ? 'reached' : (i === stageIdx ? 'reached current' : '');
+    return `<div class="stage-dot-wrap ${cls}"><div class="stage-dot"></div><div class="stage-label">${label}</div></div>`;
+  }).join('');
+
+  // Count strip
+  animateNumber(document.getElementById('countDone'), doneCount, ' done', 650);
+  animateNumber(document.getElementById('countProgress'), progressCount, ' in progress', 650);
+  animateNumber(document.getElementById('countIdle'), idleCount, ' not started', 650);
+  document.getElementById('countHoldWrap').style.display = holdCount > 0 ? 'flex' : 'none';
+  if (holdCount > 0) animateNumber(document.getElementById('countHold'), holdCount, ' on hold', 650);
+
   // Status pill
-  const pill    = document.getElementById('cStatusPill');
-  const stageN  = normVal(stage);
-  const statusN = normVal(status);
-  const compN   = normVal(completed);
-
-  if (compN === 'yes' || statusN === 'done' || stageN === 'closed') {
-    pill.textContent = 'Completed'; pill.className = 'status-pill ready';
-  } else if (statusN === 'onhold') {
-    pill.textContent = 'On Hold'; pill.className = 'status-pill hold';
+  const pill = document.getElementById('cStatusPill');
+  const closed = stageIdx === STAGES.length - 1;
+  if (doneCount === total || closed) {
+    pill.innerHTML = '<span class="pill-check">✓</span> Completed';
+    pill.className = 'status-pill ready';
+  } else if (holdCount > 0) {
+    pill.textContent = 'On Hold';
+    pill.className = 'status-pill hold';
   } else {
-    pill.textContent = 'Processing'; pill.className = 'status-pill active';
+    pill.innerHTML = '<span class="pill-dot"></span> Processing';
+    pill.className = 'status-pill active';
   }
 
-  buildStageTrack(stage);
+  // Application items ledger
+  const ledger = document.getElementById('ledgerRows');
+  ledger.innerHTML = '';
+  let latestUpdated = '—';
 
-  // Due date
-  const etaStrip = document.getElementById('etaStrip');
-  if (dueDate && dueDate !== '—') {
-    etaStrip.style.display = 'flex';
-    document.getElementById('cEta').textContent = excelDateToString(dueDate);
-  } else {
-    etaStrip.style.display = 'none';
-  }
+  const CAL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
 
-  // Description / notes
-  const notesStrip = document.getElementById('notesStrip');
-  if (description && description !== '—') {
-    notesStrip.style.display = 'flex';
-    document.getElementById('cNote').textContent = description;
-  } else {
-    notesStrip.style.display = 'none';
-  }
+  matchRows.forEach((r, i) => {
+    const desc    = getField(r, colMap, 'description');
+    const iType   = getField(r, colMap, 'appType');
+    const iStage  = getField(r, colMap, 'currentStage');
+    const iStatus = getField(r, colMap, 'status');
+    const iAssign = getField(r, colMap, 'assignee');
+    const updated = getField(r, colMap, 'updatedAt');
+    const dueRaw  = getField(r, colMap, 'dueDate');
+    if (updated !== '—') latestUpdated = updated;
+
+    const cls = statusClass(iStatus);
+
+    // Due-date badge: highlight overdue items, and items due within a week
+    let dueBadge = '';
+    if (dueRaw !== '—') {
+      let urgency = '';
+      if (cls !== 'done') {
+        const dueObj = parseAnyDate(dueRaw);
+        if (dueObj) {
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          const due = new Date(dueObj); due.setHours(0, 0, 0, 0);
+          const diffDays = Math.round((due - today) / 86400000);
+          if (diffDays < 0) urgency = 'overdue';
+          else if (diffDays <= 7) urgency = 'soon';
+        }
+      }
+      const label = urgency === 'overdue' ? 'Overdue: ' : 'Due ';
+      const dot = urgency ? '<span class="due-dot"></span>' : '';
+      dueBadge = `<div class="ledger-due ${urgency}">${dot}${CAL_SVG}${label}${esc(excelDateToString(dueRaw))}</div>`;
+    }
+
+    const row = document.createElement('div');
+    row.className = 'ledger-row is-' + cls;
+    const rowDelay = Math.min(i * 60, 600);
+    row.style.transitionDelay = rowDelay + 'ms';
+
+    const metaParts = [];
+    if (iType !== '—') metaParts.push('<b>' + esc(iType) + '</b>');
+    if (iStage !== '—') metaParts.push(esc(iStage));
+    if (iAssign !== '—') metaParts.push(esc(iAssign));
+    if (updated !== '—') metaParts.push('Updated ' + esc(excelDateToString(updated)));
+
+    row.innerHTML = `
+      <div class="ledger-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      <div class="ledger-body">
+        <div class="ledger-desc">${esc(desc !== '—' ? desc : (iType !== '—' ? iType : 'Application item'))}</div>
+        <div class="ledger-meta">${metaParts.join(' &nbsp;·&nbsp; ')}</div>
+      </div>
+      <div class="ledger-right">
+        <div class="ledger-status ${cls}">${esc(iStatus !== '—' ? iStatus : 'Pending')}</div>
+        ${dueBadge}
+      </div>
+    `;
+    const dueEl = row.querySelector('.ledger-due');
+    if (dueEl) dueEl.style.transitionDelay = (rowDelay + 180) + 'ms';
+    ledger.appendChild(row);
+  });
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    ledger.querySelectorAll('.ledger-row').forEach(row => row.classList.add('in'));
+    ledger.querySelectorAll('.ledger-due').forEach(el => el.classList.add('due-in'));
+  }));
 
   // Last updated
-  const updatedStr = updatedAt !== '—' ? excelDateToString(updatedAt) : 'Just Now';
+  const updatedStr = latestUpdated !== '—' ? excelDateToString(latestUpdated) : 'Just Now';
   document.getElementById('cLastUpdated').textContent = 'Last updated: ' + updatedStr;
 
   resultsSection.scrollIntoView({ behavior: 'smooth' });
@@ -696,8 +846,8 @@ async function doSearch() {
     return;
   }
 
-  const match = findMatch(rows, colMap, fVal, lVal, idVal);
-  showResult(match || null, colMap);
+  const matches = findClientRows(rows, colMap, fVal, lVal, idVal);
+  showResult(matches, colMap);
 }
 
 // ── REFRESH ───────────────────────────────────────────────────────────────────
@@ -712,8 +862,8 @@ async function refreshData() {
   showError(null);
 
   const { rows, colMap } = await fetchData(true);
-  const match = findMatch(rows, colMap, lastSearchFirst, lastSearchLast, lastSearchId);
-  showResult(match || null, colMap);
+  const matches = findClientRows(rows, colMap, lastSearchFirst, lastSearchLast, lastSearchId);
+  showResult(matches, colMap);
 
   btn.classList.remove('spinning');
   btn.disabled = false;
