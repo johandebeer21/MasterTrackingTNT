@@ -154,6 +154,14 @@ body::after {
 .count-dot.hold { background: var(--hold); }
 .count-dot.idle { background: var(--idle); }
 
+/* ── Due date strip ────────────────────────────────── */
+.eta-strip { padding: 24px 36px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 20px; background: rgba(255,255,255,.01); }
+.eta-icon { width: 48px; height: 48px; background: rgba(192,32,30,.1); border: 1px solid rgba(192,32,30,.2); border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; }
+.eta-icon svg { width: 22px; height: 22px; color: var(--accent-light); }
+.eta-label { font-size: .65rem; font-weight: 700; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 4px; }
+.eta-message { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: .03em; color: var(--text); line-height: 1; }
+.eta-strip.overdue .eta-message { color: var(--accent-light); }
+
 /* ── Application items ledger ──────────────────────── */
 .ledger { padding: 8px 0; }
 .ledger-title { padding: 20px 36px 4px; font-size: .72rem; font-weight: 700; color: var(--accent-light); letter-spacing: .14em; text-transform: uppercase; }
@@ -223,7 +231,7 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
 
 @media (max-width: 768px) {
   .input-group { flex-direction: column; gap: 16px; }
-  .card-header, .progress-block, .card-footer-bar { padding: 24px; }
+  .card-header, .progress-block, .eta-strip, .card-footer-bar { padding: 24px; }
   .ledger-title { padding-left: 24px; padding-right: 24px; }
   .ledger-row { padding: 16px 24px; flex-wrap: wrap; }
   .ledger-right { flex-direction: row; align-items: center; gap: 12px; }
@@ -338,6 +346,14 @@ footer { padding: 56px 24px 36px; border-top: 1px solid var(--border); backgroun
         </div>
       </div>
 
+      <div class="eta-strip" id="etaStrip" style="display:none">
+        <div class="eta-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+        <div>
+          <div class="eta-label" id="etaLabel">Due Date</div>
+          <div class="eta-message" id="cEta">—</div>
+        </div>
+      </div>
+
       <div class="ledger">
         <p class="ledger-title">Application items</p>
         <div id="ledgerRows"></div>
@@ -396,12 +412,13 @@ window.scrollTo(0, 0);
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwI5xO2njaxS3JP8Rh1Utc5gDoIbAiaqe6splx5nqQg0dbKPVEkLbJ9h9IZWFAZQ/pub?output=csv';
 
 const STAGES = [
-  'Application Received',
   'Payment Confirmed',
+  'Link Sent',
+  'Application Received',
   'Preparing Documents',
   'Quality Assurance Review',
   'Documents Ready',
-  'Documents Sent',
+  'Customer Notified',
   'Closed'
 ];
 
@@ -436,7 +453,7 @@ function resolveColumns(headers) {
     ['currentStage',  ['current stage', 'stage']],
     ['status',        ['status']],
     ['assignee',      ['assignee', 'assigned to', 'handler']],
-    ['dueDate',       ['due date', 'duedate', 'due']],
+    ['dueDate',       ['due date', 'duedate', 'due by', 'deadline', 'target date', 'due']],
     ['priority',      ['priority']],
     ['completed',     ['completed', 'complete', 'done']],
     ['description',   ['description', 'notes', 'note', 'status note', 'comments']],
@@ -703,7 +720,32 @@ function showResult(matchRows, colMap) {
     const idx = findStageIndex(getField(r, colMap, 'currentStage'));
     if (idx > stageIdx) stageIdx = idx;
   });
+  // Every item done → the whole pipeline is complete
+  if (doneCount === total) stageIdx = STAGES.length - 1;
   const stagePct = stageIdx >= 0 ? Math.round(((stageIdx + 1) / STAGES.length) * 100) : 0;
+
+  // Due date strip: earliest due date among items that aren't done yet
+  const etaStrip = document.getElementById('etaStrip');
+  let nextDue = null, nextDueRaw = '';
+  matchRows.forEach(r => {
+    const s = statusClass(getField(r, colMap, 'status'));
+    const completedYes = normVal(getField(r, colMap, 'completed')) === 'yes';
+    if (s === 'done' || completedYes) return;
+    const raw = getField(r, colMap, 'dueDate');
+    const d = parseAnyDate(raw);
+    if (d && (!nextDue || d < nextDue)) { nextDue = d; nextDueRaw = raw; }
+  });
+  if (nextDue) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const dd = new Date(nextDue); dd.setHours(0, 0, 0, 0);
+    const isOverdue = dd < today;
+    etaStrip.style.display = 'flex';
+    etaStrip.classList.toggle('overdue', isOverdue);
+    document.getElementById('etaLabel').textContent = isOverdue ? 'Overdue Since' : 'Next Due Date';
+    document.getElementById('cEta').textContent = excelDateToString(nextDueRaw);
+  } else {
+    etaStrip.style.display = 'none';
+  }
 
   // Progress bar
   const progressFill = document.getElementById('progressFill');
